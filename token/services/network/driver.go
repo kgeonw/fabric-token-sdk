@@ -27,9 +27,6 @@ func Register(name string, driver driver.Driver) {
 	if driver == nil {
 		panic("Register driver is nil")
 	}
-	if _, dup := drivers[name]; dup {
-		panic("Register called twice for driver " + name)
-	}
 	drivers[name] = driver
 }
 
