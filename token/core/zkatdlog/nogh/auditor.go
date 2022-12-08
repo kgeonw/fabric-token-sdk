@@ -8,6 +8,7 @@ package nogh
 
 import (
 	math "github.com/IBM/mathlib"
+	common2 "github.com/hyperledger-labs/fabric-token-sdk/token/core/common"
 	"github.com/hyperledger-labs/fabric-token-sdk/token/core/zkatdlog/crypto/audit"
 	"github.com/hyperledger-labs/fabric-token-sdk/token/core/zkatdlog/crypto/token"
 	"github.com/hyperledger-labs/fabric-token-sdk/token/driver"
@@ -15,10 +16,10 @@ import (
 )
 
 // AuditorCheck verifies if the passed tokenRequest matches the tokenRequestMetadata
-func (s *Service) AuditorCheck(tokenRequest *driver.TokenRequest, tokenRequestMetadata *driver.TokenRequestMetadata, txID string) error {
+func (s *Service) AuditorCheck(request driver.TokenRequest, metadata *driver.TokenRequestMetadata, anchor string) error {
 	logger.Debugf("check token request validity...")
 	var inputTokens [][]*token.Token
-	for _, transfer := range tokenRequestMetadata.Transfers {
+	for _, transfer := range metadata.Transfers {
 		inputs, err := s.TokenCommitmentLoader.GetTokenCommitments(transfer.TokenIDs)
 		if err != nil {
 			return errors.Wrapf(err, "failed getting token commitments to perform auditor check")
@@ -32,10 +33,10 @@ func (s *Service) AuditorCheck(tokenRequest *driver.TokenRequest, tokenRequestMe
 	}
 	pp := s.PublicParams()
 	if err := audit.NewAuditor(des, pp.PedParams, pp.IdemixIssuerPK, nil, math.Curves[pp.Curve]).Check(
-		tokenRequest,
-		tokenRequestMetadata,
+		request.(*common2.TokenRequest),
+		metadata,
 		inputTokens,
-		txID,
+		anchor,
 	); err != nil {
 		return errors.WithMessagef(err, "failed to perform auditor check")
 	}
