@@ -649,7 +649,7 @@ func (r *Request) MarshalToAudit() ([]byte, error) {
 	if r.Request == nil {
 		return nil, errors.Errorf("failed to marshal request in tx [%s] for audit", r.Anchor)
 	}
-	return r.TokenService.tms.MarshalToAudit("", r.Request, r.Metadata)
+	return r.TokenService.tms.MarshalToAudit(r.Anchor, r.Request, r.Metadata)
 }
 
 // MarshalToSign marshals the request to a message suitable for signing.
@@ -715,8 +715,8 @@ func (r *Request) FromBytes(request []byte) error {
 	return nil
 }
 
-// AddAuditorSignature adds an auditor signature to the request.
-func (r *Request) AddAuditorSignature(sigma []byte) {
+// AppendAuditorSignature adds an auditor signature to the request.
+func (r *Request) AppendAuditorSignature(sigma []byte) {
 	r.Request.AppendAuditorSignature(sigma)
 }
 
