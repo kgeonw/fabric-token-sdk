@@ -216,7 +216,7 @@ func (r *Request) Issue(wallet *IssuerWallet, receiver view.Identity, typ string
 	}
 
 	// Compute Issue
-	issue, tokenInfos, issuer, err := r.TokenService.tms.Issue(
+	issue, meta, err := r.TokenService.tms.Issue(
 		id,
 		typ,
 		[]uint64{q},
@@ -235,27 +235,7 @@ func (r *Request) Issue(wallet *IssuerWallet, receiver view.Identity, typ string
 		return nil, err
 	}
 	r.Request.AppendIssue(raw)
-	outputs, err := issue.GetSerializedOutputs()
-	if err != nil {
-		return nil, err
-	}
-
-	auditInfo, err := r.TokenService.tms.GetAuditInfo(receiver)
-	if err != nil {
-		return nil, err
-	}
-	if r.Metadata == nil {
-		return nil, errors.New("failed to complete issue: nil Metadata in token request")
-	}
-	r.Metadata.Issues = append(r.Metadata.Issues,
-		driver.IssueMetadata{
-			Issuer:              issuer,
-			Outputs:             outputs,
-			TokenInfo:           tokenInfos,
-			Receivers:           []view.Identity{receiver},
-			ReceiversAuditInfos: [][]byte{auditInfo},
-		},
-	)
+	r.Metadata.Issues = append(r.Metadata.Issues, *meta)
 
 	return &IssueAction{a: issue}, nil
 }
