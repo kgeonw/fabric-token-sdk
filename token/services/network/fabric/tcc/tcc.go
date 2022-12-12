@@ -14,11 +14,13 @@ import (
 	"os"
 	"runtime/debug"
 	"sync"
+	"time"
 
 	"github.com/hyperledger-labs/fabric-smart-client/platform/view/services/flogging"
 	"github.com/hyperledger-labs/fabric-smart-client/platform/view/services/tracing"
 	"github.com/hyperledger-labs/fabric-smart-client/platform/view/services/tracker/metrics"
 	"github.com/hyperledger-labs/fabric-token-sdk/token"
+	"github.com/hyperledger-labs/fabric-token-sdk/token/services/interop/vault/prover"
 	"github.com/hyperledger-labs/fabric-token-sdk/token/services/vault/translator"
 	token2 "github.com/hyperledger-labs/fabric-token-sdk/token/token"
 	"github.com/hyperledger/fabric-chaincode-go/shim"
@@ -29,11 +31,14 @@ import (
 var logger = flogging.MustGetLogger("token-sdk.tcc")
 
 const (
-	InvokeFunction            = "invoke"
-	QueryPublicParamsFunction = "queryPublicParams"
-	AddCertifierFunction      = "addCertifier"
-	QueryTokensFunctions      = "queryTokens"
-	AreTokensSpent            = "areTokensSpent"
+	InvokeFunction                     = "invoke"
+	QueryPublicParamsFunction          = "queryPublicParams"
+	AddCertifierFunction               = "addCertifier"
+	QueryTokensFunctions               = "queryTokens"
+	AreTokensSpent                     = "areTokensSpent"
+	ProofOfTokenExistenceQuery         = "proof_of_token_existence"
+	ProofOfTokenNonExistenceQuery      = "proof_of_token_non_existence"
+	ProofOfTokenMetadataExistenceQuery = "proof_of_token_metadata_existence"
 
 	PublicParamsPathVarEnv = "PUBLIC_PARAMS_FILE_PATH"
 )
@@ -60,6 +65,17 @@ type Validator interface {
 
 type PublicParametersManager interface {
 	GraphHiding() bool
+}
+
+type ProofOfTokenNonExistenceRequest struct {
+	TokenID       *token2.ID
+	OriginNetwork string
+	Deadline      time.Time
+}
+
+type ProofOfTokenMetadataExistenceRequest struct {
+	TokenID       *token2.ID
+	OriginNetwork string
 }
 
 type TokenChaincode struct {
@@ -143,6 +159,49 @@ func (cc *TokenChaincode) Invoke(stub shim.ChaincodeStubInterface) (res pb.Respo
 				return shim.Error("request to check if tokens are spent is empty")
 			}
 			return cc.AreTokensSpent(args[1], stub)
+		case ProofOfTokenExistenceQuery:
+			if len(args) != 2 {
+				argStr := ""
+				for _, arg := range args {
+					argStr += "(" + string(arg) + "),"
+				}
+				return shim.Error(fmt.Sprintf("(ProofOfTokenExistenceQuery) invalid number of arguments, expected 2, got [%d] [%s]", len(args), argStr))
+			}
+			raw, err := base64.StdEncoding.DecodeString(string(args[1]))
+			if err != nil {
+				return shim.Error(fmt.Sprintf("(ProofOfTokenExistenceQuery) invalid argument [%s]: failed unmarshalling [%s]", string(args[1]), err))
+			}
+			tokenId := &token2.ID{}
+			if err := json.Unmarshal(raw, tokenId); err != nil {
+				return shim.Error(fmt.Sprintf("(ProofOfTokenExistenceQuery) invalid argument [%s]: failed unmarshalling [%s]", string(args[1]), err))
+			}
+			return cc.proveTokenExists(tokenId, stub)
+		case ProofOfTokenNonExistenceQuery:
+			if len(args) != 2 {
+				return shim.Error(fmt.Sprintf("(ProofOfTokenNonExistenceQuery) invalid number of arguments, expected 2, got [%d]", len(args)))
+			}
+			raw, err := base64.StdEncoding.DecodeString(string(args[1]))
+			if err != nil {
+				return shim.Error(fmt.Sprintf("(ProofOfTokenNonExistenceQuery) invalid argument [%s]: failed unmarshalling [%s]", string(args[1]), err))
+			}
+			request := &ProofOfTokenNonExistenceRequest{}
+			if err := json.Unmarshal(raw, request); err != nil {
+				return shim.Error(fmt.Sprintf("(ProofOfTokenNonExistenceQuery) invalid argument [%s]: failed unmarshalling [%s]", string(args[1]), err))
+			}
+			return cc.proveTokenDoesNotExist(request.TokenID, request.OriginNetwork, request.Deadline, stub)
+		case ProofOfTokenMetadataExistenceQuery:
+			if len(args) != 2 {
+				return shim.Error(fmt.Sprintf("(ProofOfTokenMetadataExistenceQuery) invalid number of arguments, expected 2, got [%d]", len(args)))
+			}
+			raw, err := base64.StdEncoding.DecodeString(string(args[1]))
+			if err != nil {
+				return shim.Error(fmt.Sprintf("(ProofOfTokenMetadataExistenceQuery) invalid argument [%s]: failed unmarshalling [%s]", string(args[1]), err))
+			}
+			request := &ProofOfTokenMetadataExistenceRequest{}
+			if err := json.Unmarshal(raw, request); err != nil {
+				return shim.Error(fmt.Sprintf("(ProofOfTokenMetadataExistenceQuery) invalid argument [%s]: failed unmarshalling [%s]", string(args[1]), err))
+			}
+			return cc.proveTokenWithMetadataExist(request.TokenID, request.OriginNetwork, stub)
 		default:
 			return shim.Error(fmt.Sprintf("function not [%s] recognized", f))
 		}
@@ -340,4 +399,41 @@ func (cc *TokenChaincode) NewMetricsAgent(id string) (Agent, error) {
 		return nil, err
 	}
 	return cc.MetricsAgent, nil
+}
+
+func (cc *TokenChaincode) proveTokenExists(tokenId *token2.ID, stub shim.ChaincodeStubInterface) pb.Response {
+	logger.Infof("proof of existence [%s]", tokenId.String())
+	logger.Infof("generate proof of existence...")
+	rwset := &rwsWrapper{stub: stub}
+	p := prover.New(rwset, "")
+	if err := p.ProveTokenExists(tokenId); err != nil {
+		return shim.Error(fmt.Sprintf("failed to confirm if token with ID [%s] exists", tokenId))
+	}
+	logger.Infof("proof of existence...done.")
+	return shim.Success(nil)
+}
+
+func (cc *TokenChaincode) proveTokenDoesNotExist(tokenID *token2.ID, origin string, deadline time.Time, stub shim.ChaincodeStubInterface) pb.Response {
+	logger.Infof("proof of non existence of token [%s] from network [%s]", tokenID.String(), origin)
+	logger.Infof("generate proof of non-existence...")
+	rwset := &rwsWrapper{stub: stub}
+	p := prover.New(rwset, "")
+	if err := p.ProveTokenDoesNotExist(tokenID, origin, deadline); err != nil {
+		return shim.Error(fmt.Sprintf("failed to confirm if token from network [%s] and with key [%s] does not exist", origin, tokenID.String()))
+	}
+	logger.Infof("proof of non existence...done.")
+	return shim.Success(nil)
+}
+
+func (cc *TokenChaincode) proveTokenWithMetadataExist(tokenID *token2.ID, origin string, stub shim.ChaincodeStubInterface) pb.Response {
+	logger.Infof("proof of existence of token with metadata [%s] and network [%s]", tokenID.String(), origin)
+	logger.Infof("generate proof of existence...")
+	rwset := &rwsWrapper{stub: stub}
+	p := prover.New(rwset, "")
+	if err := p.ProveTokenWithMetadataExists(tokenID, origin); err != nil {
+		fmt.Println(err.Error())
+		return shim.Error(fmt.Sprintf("failed to confirm if token from network [%s] and with key [%s] exist", origin, tokenID.String()))
+	}
+	logger.Infof("proof of non existence...done.")
+	return shim.Success(nil)
 }

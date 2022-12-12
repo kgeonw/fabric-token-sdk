@@ -7,6 +7,7 @@ SPDX-License-Identifier: Apache-2.0
 package driver
 
 import (
+	fabric2 "github.com/hyperledger-labs/fabric-smart-client/platform/fabric"
 	"github.com/hyperledger-labs/fabric-smart-client/platform/view"
 	"github.com/hyperledger-labs/fabric-smart-client/platform/view/services/kvs"
 	"github.com/hyperledger-labs/fabric-token-sdk/token"
@@ -22,6 +23,22 @@ import (
 )
 
 type Driver struct {
+}
+
+func (d *Driver) NewStateQueryExecutor(sp driver.ServiceProvider, url string) (driver.StateQueryExecutor, error) {
+	return &fabtoken.StateQueryExecutor{
+		TargetNetworkURL: url,
+		SP:               sp,
+		RelaySelector:    fabric2.GetDefaultFNS(sp),
+	}, nil
+}
+
+func (d *Driver) NewStateVerifier(sp driver.ServiceProvider, url string) (driver.StateVerifier, error) {
+	return &fabtoken.StateVerifier{
+		NetworkURL:    url,
+		SP:            sp,
+		RelaySelector: fabric2.GetDefaultFNS(sp),
+	}, nil
 }
 
 func (d *Driver) PublicParametersFromBytes(params []byte) (driver.PublicParameters, error) {
