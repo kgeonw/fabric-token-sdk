@@ -14,15 +14,12 @@ import (
 	"github.com/hyperledger-labs/fabric-token-sdk/token/services/vault/keys"
 	"github.com/hyperledger-labs/fabric-token-sdk/token/services/vault/translator"
 	"github.com/hyperledger-labs/fabric-token-sdk/token/token"
-	"github.com/hyperledger/fabric/common/flogging"
 	"github.com/pkg/errors"
 )
 
 const ProofOfExistencePrefix = "pe"
 const ProofOfNonExistencePrefix = "pne"
 const ProofOfMetadataExistencePrefix = "pme"
-
-var logger = flogging.MustGetLogger("token-sdk.vault.translator")
 
 type Metadata struct {
 	// OriginTokenID is the identifier of the pledged token in the origin network

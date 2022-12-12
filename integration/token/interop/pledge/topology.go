@@ -12,7 +12,6 @@ import (
 	"github.com/hyperledger-labs/fabric-smart-client/integration/nwo/fsc"
 	"github.com/hyperledger-labs/fabric-smart-client/integration/nwo/weaver"
 	"github.com/hyperledger-labs/fabric-token-sdk/integration/nwo/token"
-	token2 "github.com/hyperledger-labs/fabric-token-sdk/integration/nwo/token"
 	fabric2 "github.com/hyperledger-labs/fabric-token-sdk/integration/nwo/token/fabric"
 	views2 "github.com/hyperledger-labs/fabric-token-sdk/integration/token/interop/pledge/views"
 	pledge2 "github.com/hyperledger-labs/fabric-token-sdk/integration/token/interop/pledge/views/pledge"
@@ -44,7 +43,7 @@ func AssetTransferTopology(tokenSDKDriver string) []api.Topology {
 		fabric.WithNetworkOrganization("alpha", "Org1"),
 		fabric.WithAnonymousIdentity(),
 		fabric.WithDefaultNetwork("alpha"),
-		token2.WithDefaultIssuerIdentity(),
+		token.WithDefaultIssuerIdentity(),
 		token.WithDefaultOwnerIdentity(tokenSDKDriver),
 	)
 	issuerAlpha.RegisterViewFactory("issue", &views2.IssueCashViewFactory{})
@@ -62,7 +61,7 @@ func AssetTransferTopology(tokenSDKDriver string) []api.Topology {
 		fabric.WithNetworkOrganization("beta", "Org3"),
 		fabric.WithAnonymousIdentity(),
 		fabric.WithDefaultNetwork("beta"),
-		token2.WithDefaultIssuerIdentity(),
+		token.WithDefaultIssuerIdentity(),
 		token.WithDefaultOwnerIdentity(tokenSDKDriver),
 	)
 	issuerBeta.RegisterViewFactory("issue", &views2.IssueCashViewFactory{})
@@ -80,7 +79,7 @@ func AssetTransferTopology(tokenSDKDriver string) []api.Topology {
 		fabric.WithNetworkOrganization("alpha", "Org1"),
 		fabric.WithNetworkOrganization("beta", "Org3"),
 		fabric.WithAnonymousIdentity(),
-		token2.WithAuditorIdentity(),
+		token.WithAuditorIdentity(),
 	)
 	auditor.RegisterViewFactory("register", &views2.RegisterAuditorViewFactory{})
 	auditor.RegisterViewFactory("balance", &views2.BalanceViewFactory{})
@@ -121,7 +120,7 @@ func AssetTransferTopology(tokenSDKDriver string) []api.Topology {
 	bob.RegisterResponder(&pledge2.FastPledgeClaimResponderView{}, &pledge2.FastPledgeClaimInitiatorView{})
 	bob.RegisterResponder(&pledge2.FastPledgeReClaimResponderView{}, &pledge2.FastPledgeReClaimInitiatorView{})
 
-	tokenTopology := token2.NewTopology()
+	tokenTopology := token.NewTopology()
 	tokenTopology.SetSDK(fscTopology, &sdk.SDK{})
 
 	tms := tokenTopology.AddTMS(fscTopology.ListNodes("auditor", "issuerAlpha", "alice", "charlie"), f1Topology, f1Topology.Channels[0].Name, tokenSDKDriver)
