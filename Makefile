@@ -115,6 +115,8 @@ clean:
 	rm -rf ./integration/token/dvp/fabtoken/cmd/
 	rm -rf ./integration/token/interop/fabtoken/cmd/
 	rm -rf ./integration/token/interop/dlog/cmd/
+	rm -rf ./integration/token/interop/pledge/fabtoken/cmd/
+	rm -rf ./integration/token/interop/pledge/dlog/cmd/
 	rm -rf ./samples/fungible/cmd
 	rm -rf ./samples/nft/cmd
 
