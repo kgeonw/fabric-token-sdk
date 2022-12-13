@@ -8,7 +8,6 @@ package core
 
 import (
 	url2 "net/url"
-	"sort"
 	"sync"
 
 	"github.com/hyperledger-labs/fabric-smart-client/platform/view"
@@ -34,25 +33,6 @@ func RegisterSSPDriver(name string, driver driver.SSPDriver) {
 		panic("Register called twice for ssp " + name)
 	}
 	sspDriver[name] = driver
-}
-
-func unregisterAllSSPDriver() {
-	sspDriverMu.Lock()
-	defer sspDriverMu.Unlock()
-	// For tests.
-	sspDriver = make(map[string]driver.SSPDriver)
-}
-
-// SSPDrivers returns a sorted list of the names of the registered SSPDriver.
-func SSPDrivers() []string {
-	sspDriverMu.RLock()
-	defer sspDriverMu.RUnlock()
-	list := make([]string, 0, len(sspDriver))
-	for name := range sspDriver {
-		list = append(list, name)
-	}
-	sort.Strings(list)
-	return list
 }
 
 type stateServiceProvider struct {

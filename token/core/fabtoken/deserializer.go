@@ -13,6 +13,7 @@ import (
 	"github.com/hyperledger-labs/fabric-token-sdk/token/core/identity"
 	"github.com/hyperledger-labs/fabric-token-sdk/token/core/identity/msp/x509"
 	"github.com/hyperledger-labs/fabric-token-sdk/token/core/interop/htlc"
+	"github.com/hyperledger-labs/fabric-token-sdk/token/core/interop/pledge"
 	"github.com/hyperledger-labs/fabric-token-sdk/token/driver"
 )
 
@@ -35,7 +36,7 @@ func NewDeserializer() *deserializer {
 	return &deserializer{
 		auditorDeserializer: &x509.MSPIdentityDeserializer{},
 		issuerDeserializer:  &x509.MSPIdentityDeserializer{},
-		ownerDeserializer:   htlc.NewDeserializer(identity.NewRawOwnerIdentityDeserializer(&x509.MSPIdentityDeserializer{})),
+		ownerDeserializer:   pledge.NewDeserializer(identity.NewRawOwnerIdentityDeserializer(&x509.MSPIdentityDeserializer{})),
 	}
 }
 

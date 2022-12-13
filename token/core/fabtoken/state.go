@@ -137,13 +137,10 @@ func (v *StateVerifier) VerifyProofExistence(proofRaw []byte, tokenID *token.ID,
 	if err != nil {
 		return errors.Wrapf(err, "failed to check proof of existence")
 	}
-	tokn := &token.Token{}
-	err = json.Unmarshal(raw, tokn)
+	tok := &token.Token{}
+	err = json.Unmarshal(raw, tok)
 	if err != nil {
 		return err
-	}
-	if tokn == nil {
-		return errors.Errorf("invalid pledged token")
 	}
 	// Validate against pledge
 	logger.Debugf("verify proof of existence for token id [%s]", tokenID)
@@ -159,10 +156,10 @@ func (v *StateVerifier) VerifyProofExistence(proofRaw []byte, tokenID *token.ID,
 	info := pledges[0]
 	logger.Debugf("found pledge info for token id [%s]: [%s]", tokenID, info.Source)
 
-	if tokn.Type != info.TokenType {
+	if tok.Type != info.TokenType {
 		return errors.Errorf("type of pledge token does not match type in claim request")
 	}
-	q, err := token.ToQuantity(tokn.Quantity, 64)
+	q, err := token.ToQuantity(tok.Quantity, 64)
 	if err != nil {
 		return err
 	}
@@ -170,7 +167,7 @@ func (v *StateVerifier) VerifyProofExistence(proofRaw []byte, tokenID *token.ID,
 	if expectedQ.Cmp(q) != 0 {
 		return errors.Errorf("quantity in pledged token is different from quantity in claim request")
 	}
-	owner, err := identity.UnmarshallRawOwner(tokn.Owner.Raw)
+	owner, err := identity.UnmarshallRawOwner(tok.Owner.Raw)
 	if err != nil {
 		return err
 	}

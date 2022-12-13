@@ -7,7 +7,6 @@ SPDX-License-Identifier: Apache-2.0
 package fabric
 
 import (
-	"sort"
 	"sync"
 
 	"github.com/hyperledger-labs/fabric-smart-client/platform/fabric"
@@ -15,7 +14,6 @@ import (
 	"github.com/hyperledger-labs/fabric-smart-client/platform/view/services/flogging"
 	"github.com/hyperledger-labs/fabric-token-sdk/token"
 	"github.com/hyperledger-labs/fabric-token-sdk/token/core"
-	core2 "github.com/hyperledger-labs/fabric-token-sdk/token/core"
 	"github.com/hyperledger-labs/fabric-token-sdk/token/driver"
 	"github.com/hyperledger-labs/fabric-token-sdk/token/services/interop"
 	"github.com/pkg/errors"
@@ -53,25 +51,6 @@ func RegisterStateDriver(name string, driver TokenSDKStateDriver) {
 		panic("Register called twice for driver " + name)
 	}
 	drivers[name] = driver
-}
-
-func unregisterAllStateDriver() {
-	driversMu.Lock()
-	defer driversMu.Unlock()
-	// For tests.
-	drivers = make(map[string]TokenSDKStateDriver)
-}
-
-// StateDrivers returns a sorted list of the names of the registered SSPDriver.
-func StateDrivers() []string {
-	driversMu.RLock()
-	defer driversMu.RUnlock()
-	list := make([]string, 0, len(drivers))
-	for name := range drivers {
-		list = append(list, name)
-	}
-	sort.Strings(list)
-	return list
 }
 
 type StateServiceProvider struct {
@@ -207,5 +186,5 @@ func (f *SSPDriver) New(sp driver.ServiceProvider) (driver.StateServiceProvider,
 }
 
 func init() {
-	core2.RegisterSSPDriver("fabric", NewSSPDriver())
+	core.RegisterSSPDriver("fabric", NewSSPDriver())
 }

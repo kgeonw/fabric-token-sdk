@@ -73,7 +73,6 @@ func (d *Deserializer) getPledgeVerifier(raw []byte) (driver.Verifier, error) {
 }
 
 func (d *Deserializer) getHTLCVerifier(raw []byte) (driver.Verifier, error) {
-	logger.Debugf("deserializing HTLCVerifier")
 	script := &htlc.Script{}
 	err := json.Unmarshal(raw, script)
 	if err != nil {

@@ -73,7 +73,7 @@ func (s *Service) Transfer(txID string, wallet driver.OwnerWallet, ids []*token2
 			receivers = append(receivers, output.Output.Owner.Raw)
 			continue
 		}
-		_, recipient, err := htlc.GetScriptSenderAndRecipient(owner)
+		_, recipient, err := htlc.GetScriptSenderAndRecipient(owner) // TODO
 		if err != nil {
 			return nil, nil, errors.Wrap(err, "failed getting script sender and recipient")
 		}
