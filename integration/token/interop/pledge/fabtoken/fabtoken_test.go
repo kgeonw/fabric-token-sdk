@@ -7,8 +7,6 @@ SPDX-License-Identifier: Apache-2.0
 package fabtoken_test
 
 import (
-	"runtime"
-
 	"github.com/hyperledger-labs/fabric-smart-client/integration"
 	integration2 "github.com/hyperledger-labs/fabric-token-sdk/integration"
 	"github.com/hyperledger-labs/fabric-token-sdk/integration/nwo/token"
@@ -33,13 +31,9 @@ var _ = Describe("FabToken end to end", func() {
 	Describe("Asset Transfer With Two Fabric Networks", func() {
 		BeforeEach(func() {
 			var err error
-			testDir := ""
-			if runtime.GOOS == "darwin" {
-				testDir = "./testdata"
-			}
 			ii, err = integration.New(
 				integration2.FabTokenInteropAssetTransfer.StartPortForNode(),
-				testDir,
+				"",
 				pledge.AssetTransferTopology("fabtoken")...,
 			)
 			Expect(err).NotTo(HaveOccurred())
@@ -52,5 +46,4 @@ var _ = Describe("FabToken end to end", func() {
 			pledge.TestAssetTransferWithTwoNetworks(ii)
 		})
 	})
-
 })

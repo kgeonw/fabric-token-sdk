@@ -11,12 +11,12 @@ import (
 	"github.com/hyperledger-labs/fabric-smart-client/integration/nwo/fabric"
 	"github.com/hyperledger-labs/fabric-smart-client/integration/nwo/fsc"
 	"github.com/hyperledger-labs/fabric-smart-client/integration/nwo/weaver"
+	fabric3 "github.com/hyperledger-labs/fabric-smart-client/platform/fabric/sdk"
 	"github.com/hyperledger-labs/fabric-token-sdk/integration/nwo/token"
 	fabric2 "github.com/hyperledger-labs/fabric-token-sdk/integration/nwo/token/fabric"
 	views2 "github.com/hyperledger-labs/fabric-token-sdk/integration/token/interop/pledge/views"
 	pledge2 "github.com/hyperledger-labs/fabric-token-sdk/integration/token/interop/pledge/views/pledge"
 	sdk "github.com/hyperledger-labs/fabric-token-sdk/token/sdk"
-	. "github.com/onsi/gomega"
 )
 
 func AssetTransferTopology(tokenSDKDriver string) []api.Topology {
@@ -44,7 +44,7 @@ func AssetTransferTopology(tokenSDKDriver string) []api.Topology {
 		fabric.WithAnonymousIdentity(),
 		fabric.WithDefaultNetwork("alpha"),
 		token.WithDefaultIssuerIdentity(),
-		token.WithDefaultOwnerIdentity(tokenSDKDriver),
+		token.WithOwnerIdentity(tokenSDKDriver, "issuer.owner"),
 	)
 	issuerAlpha.RegisterViewFactory("issue", &views2.IssueCashViewFactory{})
 	issuerAlpha.RegisterViewFactory("balance", &views2.BalanceViewFactory{})
@@ -62,7 +62,7 @@ func AssetTransferTopology(tokenSDKDriver string) []api.Topology {
 		fabric.WithAnonymousIdentity(),
 		fabric.WithDefaultNetwork("beta"),
 		token.WithDefaultIssuerIdentity(),
-		token.WithDefaultOwnerIdentity(tokenSDKDriver),
+		token.WithOwnerIdentity(tokenSDKDriver, "issuer.owner"),
 	)
 	issuerBeta.RegisterViewFactory("issue", &views2.IssueCashViewFactory{})
 	issuerBeta.RegisterViewFactory("balance", &views2.BalanceViewFactory{})
@@ -122,33 +122,18 @@ func AssetTransferTopology(tokenSDKDriver string) []api.Topology {
 
 	tokenTopology := token.NewTopology()
 	tokenTopology.SetSDK(fscTopology, &sdk.SDK{})
-
-	tms := tokenTopology.AddTMS(fscTopology.ListNodes("auditor", "issuerAlpha", "alice", "charlie"), f1Topology, f1Topology.Channels[0].Name, tokenSDKDriver)
-	switch tokenSDKDriver {
-	case "dlog":
-		// max token value is 100^2 - 1 = 9999
-		tms.SetTokenGenPublicParams("100", "2")
-	case "fabtoken":
-		tms.SetTokenGenPublicParams("9999")
-	default:
-		Expect(false).To(BeTrue(), "expected token driver in (dlog,fabtoken), got [%s]", tokenSDKDriver)
-	}
+	tms := tokenTopology.AddTMS(fscTopology.ListNodes(), f1Topology, f1Topology.Channels[0].Name, tokenSDKDriver)
 	tms.SetTokenGenPublicParams("100", "2")
 	fabric2.SetOrgs(tms, "Org1")
 	tms.AddAuditor(auditor)
 
-	tms = tokenTopology.AddTMS(fscTopology.ListNodes("auditor", "issuerBeta", "bob"), f2Topology, f2Topology.Channels[0].Name, tokenSDKDriver)
-	switch tokenSDKDriver {
-	case "dlog":
-		// max token value is 100^2 - 1 = 9999
-		tms.SetTokenGenPublicParams("100", "2")
-	case "fabtoken":
-		tms.SetTokenGenPublicParams("9999")
-	default:
-		Expect(false).To(BeTrue(), "expected token driver in (dlog,fabtoken), got [%s]", tokenSDKDriver)
-	}
+	tms = tokenTopology.AddTMS(fscTopology.ListNodes(), f2Topology, f2Topology.Channels[0].Name, tokenSDKDriver)
+	tms.SetTokenGenPublicParams("100", "2")
 	fabric2.SetOrgs(tms, "Org3")
 	tms.AddAuditor(auditor)
+
+	// Add Fabric SDK to FSC Nodes
+	fscTopology.AddSDK(&fabric3.SDK{})
 
 	return []api.Topology{f1Topology, f2Topology, tokenTopology, wTopology, fscTopology}
 }
