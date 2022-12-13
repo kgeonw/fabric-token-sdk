@@ -167,7 +167,6 @@ func (f *StateServiceProvider) fetchPublicParameters(url string) ([]byte, error)
 }
 
 type SSPDriver struct {
-	sp             driver.ServiceProvider
 	mu             sync.RWMutex
 	queryExecutors map[string]driver.StateQueryExecutor
 	verifiers      map[string]driver.StateVerifier
