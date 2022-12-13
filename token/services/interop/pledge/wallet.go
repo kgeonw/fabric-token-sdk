@@ -192,9 +192,9 @@ func (s *ScriptOwnership) IsMine(tms *token.ManagementService, tok *token2.Token
 		} {
 			logger.Debugf("Is Mine [%s,%s,%s] as a %s?", view2.Identity(tok.Owner.Raw), tok.Type, tok.Quantity, beneficiary.desc)
 			// TODO: differentiate better
-			if tms.WalletManager().Wallet(beneficiary.identity) != nil {
+			if wallet := tms.WalletManager().OwnerWalletByIdentity(beneficiary.identity); wallet != nil {
 				logger.Debugf("Is Mine [%s,%s,%s] as a %s? Yes", view2.Identity(tok.Owner.Raw), tok.Type, tok.Quantity, beneficiary.desc)
-				return nil, true
+				return []string{wallet.ID()}, true
 			}
 		}
 
