@@ -122,12 +122,12 @@ func AssetTransferTopology(tokenSDKDriver string) []api.Topology {
 
 	tokenTopology := token.NewTopology()
 	tokenTopology.SetSDK(fscTopology, &sdk.SDK{})
-	tms := tokenTopology.AddTMS(fscTopology.ListNodes(), f1Topology, f1Topology.Channels[0].Name, tokenSDKDriver)
+	tms := tokenTopology.AddTMS(fscTopology.ListNodes("auditor", "issuerAlpha", "alice"), f1Topology, f1Topology.Channels[0].Name, tokenSDKDriver)
 	tms.SetTokenGenPublicParams("100", "2")
 	fabric2.SetOrgs(tms, "Org1")
 	tms.AddAuditor(auditor)
 
-	tms = tokenTopology.AddTMS(fscTopology.ListNodes(), f2Topology, f2Topology.Channels[0].Name, tokenSDKDriver)
+	tms = tokenTopology.AddTMS(fscTopology.ListNodes("auditor", "issuerBeta", "bob"), f2Topology, f2Topology.Channels[0].Name, tokenSDKDriver)
 	tms.SetTokenGenPublicParams("100", "2")
 	fabric2.SetOrgs(tms, "Org3")
 	tms.AddAuditor(auditor)
