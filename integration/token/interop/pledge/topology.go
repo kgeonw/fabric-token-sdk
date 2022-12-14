@@ -44,7 +44,7 @@ func AssetTransferTopology(tokenSDKDriver string) []api.Topology {
 		fabric.WithAnonymousIdentity(),
 		fabric.WithDefaultNetwork("alpha"),
 		token.WithIssuerIdentity("issuer.id1"),
-		token.WithDefaultOwnerIdentity(tokenSDKDriver),
+		token.WithOwnerIdentity(tokenSDKDriver, "issuer.id1.owner"),
 	)
 	issuerAlpha.RegisterViewFactory("issue", &views2.IssueCashViewFactory{})
 	issuerAlpha.RegisterViewFactory("balance", &views2.BalanceViewFactory{})
@@ -62,7 +62,7 @@ func AssetTransferTopology(tokenSDKDriver string) []api.Topology {
 		fabric.WithAnonymousIdentity(),
 		fabric.WithDefaultNetwork("beta"),
 		token.WithIssuerIdentity("issuer.id2"),
-		token.WithDefaultOwnerIdentity(tokenSDKDriver),
+		token.WithOwnerIdentity(tokenSDKDriver, "issuer.id2.owner"),
 	)
 	issuerBeta.RegisterViewFactory("issue", &views2.IssueCashViewFactory{})
 	issuerBeta.RegisterViewFactory("balance", &views2.BalanceViewFactory{})
