@@ -9,6 +9,8 @@ package htlc
 import (
 	"encoding/json"
 
+	"github.com/hyperledger-labs/fabric-token-sdk/token/services/interop/pledge"
+
 	"github.com/hyperledger-labs/fabric-smart-client/platform/view/view"
 	"github.com/hyperledger-labs/fabric-token-sdk/token/core/identity"
 	"github.com/hyperledger-labs/fabric-token-sdk/token/services/interop/htlc"
@@ -81,6 +83,14 @@ func GetScriptSenderAndRecipient(ro *identity.RawOwner) (sender, recipient view.
 		err = json.Unmarshal(ro.Identity, script)
 		if err != nil {
 			return nil, nil, errors.Wrapf(err, "failed to unmarshal htlc script")
+		}
+		return script.Sender, script.Recipient, nil
+	}
+	if ro.Type == pledge.ScriptTypePledge {
+		script := &pledge.Script{}
+		err = json.Unmarshal(ro.Identity, script)
+		if err != nil {
+			return nil, nil, errors.Wrapf(err, "failed to unmarshal pledge script")
 		}
 		return script.Sender, script.Recipient, nil
 	}
