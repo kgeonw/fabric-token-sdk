@@ -9,7 +9,6 @@ package pledge
 import (
 	"github.com/hyperledger-labs/fabric-smart-client/platform/view/view"
 	"github.com/hyperledger-labs/fabric-token-sdk/token/services/ttx"
-	"github.com/pkg/errors"
 )
 
 type Transaction struct {
@@ -42,21 +41,4 @@ func NewTransactionFromBytes(ctx view.Context, network, channel string, raw []by
 	return &Transaction{
 		Transaction: tx,
 	}, nil
-}
-
-func ReceiveTransaction(context view.Context) (*Transaction, error) {
-	logger.Debugf("receive a new transaction...")
-
-	txBoxed, err := context.RunView(NewReceiveTransactionView(""))
-	if err != nil {
-		return nil, err
-	}
-
-	cctx, ok := txBoxed.(*Transaction)
-	if !ok {
-		return nil, errors.Errorf("received transaction of wrong type [%T]", cctx)
-	}
-	logger.Debugf("received transaction with id [%s]", cctx.ID())
-
-	return cctx, nil
 }
