@@ -10,7 +10,6 @@ import (
 	"encoding/json"
 	"time"
 
-	"github.com/hyperledger-labs/fabric-smart-client/platform/fabric"
 	view2 "github.com/hyperledger-labs/fabric-smart-client/platform/view"
 	"github.com/hyperledger-labs/fabric-smart-client/platform/view/services/assert"
 	"github.com/hyperledger-labs/fabric-smart-client/platform/view/services/flogging"
@@ -64,9 +63,8 @@ func (rv *ReclaimInitiatorView) Call(context view.Context) (interface{}, error) 
 	assert.NotNil(issuerSignature)
 
 	// At this point, alice is ready to prepare the token transaction.
-	tx, err := pledge.NewTransaction(
+	tx, err := pledge.NewAnonymousTransaction(
 		context,
-		fabric.GetIdentityProvider(context, rv.TMSID.Network).DefaultIdentity(),
 		ttx.WithAuditor(view2.GetIdentityProvider(context).Identity("auditor")),
 		ttx.WithTMSID(rv.TMSID),
 	)

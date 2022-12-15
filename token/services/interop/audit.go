@@ -46,7 +46,7 @@ func (i *Input) IsPledge() bool {
 
 func (i *Input) HTLC() (*htlc.Script, error) {
 	if !i.isHTLC {
-		return nil, nil
+		return nil, errors.New("this input does not refer to an HTLC script")
 	}
 	owner, err := identity.UnmarshallRawOwner(i.Owner)
 	if err != nil {
@@ -62,7 +62,7 @@ func (i *Input) HTLC() (*htlc.Script, error) {
 
 func (i *Input) Pledge() (*pledge.PledgeScript, error) {
 	if !i.isPledge {
-		return nil, nil
+		return nil, errors.New("this input does not refer to a pledge script")
 	}
 	owner, err := identity.UnmarshallRawOwner(i.Owner)
 	if err != nil {
@@ -110,7 +110,7 @@ func (o *Output) IsPledge() bool {
 
 func (o *Output) HTLC() (*htlc.Script, error) {
 	if !o.isHTLC {
-		return nil, nil
+		return nil, errors.New("this output does not refer to an HTLC script")
 	}
 	owner, err := identity.UnmarshallRawOwner(o.Owner)
 	if err != nil {
@@ -126,7 +126,7 @@ func (o *Output) HTLC() (*htlc.Script, error) {
 
 func (o *Output) Pledge() (*pledge.PledgeScript, error) {
 	if !o.isPledge {
-		return nil, nil
+		return nil, errors.New("this output does not refer to a pledge script")
 	}
 	owner, err := identity.UnmarshallRawOwner(o.Owner)
 	if err != nil {

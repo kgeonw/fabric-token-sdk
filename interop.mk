@@ -32,7 +32,7 @@ integration-tests-interop-dlog-t6:
 
 .PHONY: integration-tests-interop-dlog-t7
 integration-tests-interop-dlog-t7:
-	cd ./integration/token/interop/pledge/dlog; export FAB_BINS=$(FAB_BINS); ginkgo $(GINKGO_TEST_OPTS) --focus "Asset Transfer With Two Fabric Networks" .
+	cd ./integration/token/interop/dlog; export FAB_BINS=$(FAB_BINS); ginkgo $(GINKGO_TEST_OPTS) --focus "Asset Transfer With Two Fabric Networks" .
 
 .PHONY: integration-tests-interop-fabtoken-t1
 integration-tests-interop-fabtoken-t1:
@@ -60,4 +60,4 @@ integration-tests-interop-fabtoken-t6:
 
 .PHONY: integration-tests-interop-fabtoken-t7
 integration-tests-interop-fabtoken-t7:
-	cd ./integration/token/interop/pledge/fabtoken; export FAB_BINS=$(FAB_BINS); ginkgo $(GINKGO_TEST_OPTS) --focus "Asset Transfer With Two Fabric Networks" .
+	cd ./integration/token/interop/fabtoken; export FAB_BINS=$(FAB_BINS); ginkgo $(GINKGO_TEST_OPTS) --focus "Asset Transfer With Two Fabric Networks" .

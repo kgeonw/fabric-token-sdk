@@ -12,7 +12,6 @@ import (
 	"math/rand"
 	"time"
 
-	"github.com/hyperledger-labs/fabric-smart-client/platform/fabric"
 	view2 "github.com/hyperledger-labs/fabric-smart-client/platform/view"
 	"github.com/hyperledger-labs/fabric-smart-client/platform/view/services/assert"
 	"github.com/hyperledger-labs/fabric-smart-client/platform/view/view"
@@ -65,9 +64,8 @@ func (pv *PledgeView) Call(context view.Context) (interface{}, error) {
 	assert.NoError(err, "failed getting recipient identity")
 
 	// Create a new transaction
-	tx, err := pledge.NewTransaction(
+	tx, err := pledge.NewAnonymousTransaction(
 		context,
-		fabric.GetIdentityProvider(context, pv.OriginTMSID.Network).DefaultIdentity(),
 		ttx.WithAuditor(view2.GetIdentityProvider(context).Identity("auditor")),
 		ttx.WithTMSID(pv.OriginTMSID),
 	)

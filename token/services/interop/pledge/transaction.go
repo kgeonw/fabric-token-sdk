@@ -25,9 +25,9 @@ func (t *Transaction) Outputs() (*OutputStream, error) {
 	return NewOutputStream(outs), nil
 }
 
-// NewTransaction returns a new token transaction customized with the passed opts that will be signed by the passed signer
-func NewTransaction(sp view.Context, signer view.Identity, opts ...ttx.TxOption) (*Transaction, error) {
-	tx, err := ttx.NewTransaction(sp, signer, opts...)
+// NewAnonymousTransaction returns a new anonymous token transaction customized with the passed opts
+func NewAnonymousTransaction(sp view.Context, opts ...ttx.TxOption) (*Transaction, error) {
+	tx, err := ttx.NewAnonymousTransaction(sp, opts...)
 	if err != nil {
 		return nil, err
 	}

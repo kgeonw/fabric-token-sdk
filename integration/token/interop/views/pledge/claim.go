@@ -120,9 +120,8 @@ func (c *ClaimIssuerView) Call(context view.Context) (interface{}, error) {
 	logger.Debugf("claim request valid, preparing claim transaction [%s]", err)
 
 	// At this point, the issuer is ready to prepare the token transaction.
-	tx, err := pledge.NewTransaction(
+	tx, err := pledge.NewAnonymousTransaction(
 		context,
-		fabric.GetDefaultIdentityProvider(context).DefaultIdentity(),
 		ttx.WithAuditor(view3.GetIdentityProvider(context).Identity("auditor")),
 	)
 	assert.NoError(err, "failed creating a new transaction")

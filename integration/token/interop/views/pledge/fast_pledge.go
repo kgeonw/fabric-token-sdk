@@ -68,9 +68,8 @@ func (v *FastPledgeClaimInitiatorView) Call(context view.Context) (interface{}, 
 	assert.NoError(err, "failed getting recipient identity")
 
 	// Create a new transaction
-	tx, err := pledge.NewTransaction(
+	tx, err := pledge.NewAnonymousTransaction(
 		context,
-		fabric.GetIdentityProvider(context, v.OriginTMSID.Network).DefaultIdentity(),
 		ttx.WithAuditor(view3.GetIdentityProvider(context).Identity("auditor")),
 		ttx.WithTMSID(v.OriginTMSID),
 	)
@@ -253,9 +252,8 @@ func (v *FastPledgeReClaimInitiatorView) Call(context view.Context) (interface{}
 	assert.NoError(err, "failed getting recipient identity")
 
 	// Create a new transaction
-	tx, err := pledge.NewTransaction(
+	tx, err := pledge.NewAnonymousTransaction(
 		context,
-		fabric.GetIdentityProvider(context, v.OriginTMSID.Network).DefaultIdentity(),
 		ttx.WithAuditor(view3.GetIdentityProvider(context).Identity("auditor")),
 		ttx.WithTMSID(v.OriginTMSID),
 	)
