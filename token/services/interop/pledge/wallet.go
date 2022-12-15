@@ -45,10 +45,6 @@ func GetIssuerWallet(sp view.ServiceProvider, id string, opts ...token.ServiceOp
 	return w, nil
 }
 
-func GetWalletByIdentity(sp view.ServiceProvider, identity view2.Identity, opts ...token.ServiceOption) *token.OwnerWallet {
-	return token.GetManagementService(sp, opts...).WalletManager().OwnerWalletByIdentity(identity)
-}
-
 type QueryService interface {
 	ListUnspentTokens() (*token2.UnspentTokens, error)
 }
