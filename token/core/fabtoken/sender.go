@@ -112,6 +112,10 @@ func (s *Service) Transfer(txID string, wallet driver.OwnerWallet, ids []*token2
 		if err != nil {
 			return nil, nil, errors.Wrapf(err, "failed getting audit info for recipient identity [%s]", view.Identity(output.Output.Owner.Raw).String())
 		}
+		if len(output.Output.Owner.Raw) == 0 { // redeem
+			receiverAuditInfos = append(receiverAuditInfos, []byte{})
+			continue
+		}
 		owner, err := identity.UnmarshallRawOwner(output.Output.Owner.Raw)
 		if err != nil {
 			return nil, nil, errors.Wrap(err, "failed to unmarshal owner of token")

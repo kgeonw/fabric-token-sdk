@@ -72,23 +72,17 @@ func (s *Service) Issue(issuerIdentity view.Identity, typ string, values []uint6
 			proof = proofOpt.([]byte)
 		}
 	}
+	var md map[string][]byte
 	if metadata != nil {
 		marshalled, err := json.Marshal(metadata)
 		key := hash.Hashable(marshalled).String()
 		if err != nil {
 			panic(fmt.Sprintf("failed marshaling metadata; origin network [%s]; origin tokenID [%s]", metadata.OriginNetwork, metadata.OriginTokenID))
 		}
-		return &IssueAction{
-				Issuer:   issuerIdentity,
-				Outputs:  outs,
-				Metadata: map[string][]byte{key: marshalled, key + "proof_of_claim": proof},
-			},
-			metas,
-			issuerIdentity,
-			nil
+		md = map[string][]byte{key: marshalled, key + "proof_of_claim": proof}
 	}
 
-	return &IssueAction{Issuer: issuerIdentity, Outputs: outs},
+	return &IssueAction{Issuer: issuerIdentity, Outputs: outs, Metadata: md},
 		metas,
 		issuerIdentity,
 		nil
