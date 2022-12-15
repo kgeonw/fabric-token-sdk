@@ -9,14 +9,13 @@ package pledge
 import (
 	"encoding/json"
 
-	"github.com/hyperledger-labs/fabric-token-sdk/token/services/network/processor"
-
 	"github.com/hyperledger-labs/fabric-smart-client/platform/fabric"
 	"github.com/hyperledger-labs/fabric-smart-client/platform/view"
 	view2 "github.com/hyperledger-labs/fabric-smart-client/platform/view/view"
 	"github.com/hyperledger-labs/fabric-token-sdk/token"
 	"github.com/hyperledger-labs/fabric-token-sdk/token/core/identity"
 	fabric3 "github.com/hyperledger-labs/fabric-token-sdk/token/services/network/fabric"
+	"github.com/hyperledger-labs/fabric-token-sdk/token/services/network/processor"
 	"github.com/hyperledger-labs/fabric-token-sdk/token/services/vault"
 	token2 "github.com/hyperledger-labs/fabric-token-sdk/token/token"
 	"github.com/pkg/errors"
@@ -61,11 +60,16 @@ type IssuerWallet struct {
 
 func NewIssuerWallet(sp view.ServiceProvider, wallet *token.IssuerWallet) *IssuerWallet {
 	ch := fabric.GetDefaultChannel(sp)
+	ts, err := processor.NewCommonTokenStore(sp)
+	if err != nil {
+		logger.Errorf("could not create a new common token store; err: [%v]", err)
+		return nil
+	}
 	v := vault.New(
 		sp,
 		ch.Name(),
 		token.GetManagementService(sp).Namespace(),
-		fabric3.NewVault(ch, processor.NewCommonTokenStore(sp)),
+		fabric3.NewVault(ch, ts),
 	)
 	return &IssuerWallet{
 		wallet:       wallet,
@@ -99,11 +103,16 @@ func GetWallet(sp view.ServiceProvider, id string, opts ...token.ServiceOption) 
 
 func Wallet(sp view.ServiceProvider, wallet *token.OwnerWallet) *OwnerWallet {
 	ch := fabric.GetDefaultChannel(sp)
+	ts, err := processor.NewCommonTokenStore(sp)
+	if err != nil {
+		logger.Errorf("could not create a new common token store; err: [%v]", err)
+		return nil
+	}
 	v := vault.New(
 		sp,
 		ch.Name(),
 		token.GetManagementService(sp).Namespace(),
-		fabric3.NewVault(ch, processor.NewCommonTokenStore(sp)),
+		fabric3.NewVault(ch, ts),
 	)
 	return &OwnerWallet{
 		wallet:       wallet,

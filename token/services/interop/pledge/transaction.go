@@ -11,10 +11,12 @@ import (
 	"github.com/hyperledger-labs/fabric-token-sdk/token/services/ttx"
 )
 
+// Transaction holds a ttx transaction
 type Transaction struct {
 	*ttx.Transaction
 }
 
+// Outputs returns a new OutputStream of the transaction's outputs
 func (t *Transaction) Outputs() (*OutputStream, error) {
 	outs, err := t.TokenRequest.Outputs()
 	if err != nil {
@@ -23,6 +25,7 @@ func (t *Transaction) Outputs() (*OutputStream, error) {
 	return NewOutputStream(outs), nil
 }
 
+// NewTransaction returns a new token transaction customized with the passed opts that will be signed by the passed signer
 func NewTransaction(sp view.Context, signer view.Identity, opts ...ttx.TxOption) (*Transaction, error) {
 	tx, err := ttx.NewTransaction(sp, signer, opts...)
 	if err != nil {
@@ -33,6 +36,7 @@ func NewTransaction(sp view.Context, signer view.Identity, opts ...ttx.TxOption)
 	}, nil
 }
 
+// NewTransactionFromBytes returns a new transaction from the passed bytes
 func NewTransactionFromBytes(ctx view.Context, network, channel string, raw []byte) (*Transaction, error) {
 	tx, err := ttx.NewTransactionFromBytes(ctx, raw)
 	if err != nil {
