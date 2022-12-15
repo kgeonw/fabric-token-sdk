@@ -16,15 +16,6 @@ type Transaction struct {
 	*ttx.Transaction
 }
 
-// Outputs returns a new OutputStream of the transaction's outputs
-func (t *Transaction) Outputs() (*OutputStream, error) {
-	outs, err := t.TokenRequest.Outputs()
-	if err != nil {
-		return nil, err
-	}
-	return NewOutputStream(outs), nil
-}
-
 // NewAnonymousTransaction returns a new anonymous token transaction customized with the passed opts
 func NewAnonymousTransaction(sp view.Context, opts ...ttx.TxOption) (*Transaction, error) {
 	tx, err := ttx.NewAnonymousTransaction(sp, opts...)
@@ -45,4 +36,13 @@ func NewTransactionFromBytes(ctx view.Context, network, channel string, raw []by
 	return &Transaction{
 		Transaction: tx,
 	}, nil
+}
+
+// Outputs returns a new OutputStream of the transaction's outputs
+func (t *Transaction) Outputs() (*OutputStream, error) {
+	outs, err := t.TokenRequest.Outputs()
+	if err != nil {
+		return nil, err
+	}
+	return NewOutputStream(outs), nil
 }

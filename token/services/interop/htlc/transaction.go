@@ -76,17 +76,6 @@ type Transaction struct {
 	*ttx.Transaction
 }
 
-// NewTransaction returns a new token transaction customized with the passed opts that will be signed by the passed signer
-func NewTransaction(sp view.Context, signer view.Identity, opts ...ttx.TxOption) (*Transaction, error) {
-	tx, err := ttx.NewTransaction(sp, signer, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return &Transaction{
-		Transaction: tx,
-	}, nil
-}
-
 // NewAnonymousTransaction returns a new anonymous token transaction customized with the passed opts
 func NewAnonymousTransaction(sp view.Context, opts ...ttx.TxOption) (*Transaction, error) {
 	tx, err := ttx.NewAnonymousTransaction(sp, opts...)

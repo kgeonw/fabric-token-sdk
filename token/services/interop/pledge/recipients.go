@@ -223,15 +223,11 @@ func RespondRequestPledgeRecipientIdentity(context view.Context) (view.Identity,
 }
 
 // RequestRecipientIdentity executes the RequestRecipientIdentityView.
-// The sender contacts the recipient's FSC node identified via the passed view identity.
-// The sender gets back the identity the recipient wants to use to assign ownership of tokens.
 func RequestRecipientIdentity(context view.Context, recipient view.Identity, opts ...token.ServiceOption) (view.Identity, error) {
 	return ttx.RequestRecipientIdentity(context, recipient, opts...)
 }
 
 // RespondRequestRecipientIdentity executes the RespondRequestRecipientIdentityView.
-// The recipient sends back the identity to receive ownership of tokens.
-// The identity is taken from the wallet
 func RespondRequestRecipientIdentity(context view.Context) (view.Identity, error) {
 	return ttx.RespondRequestRecipientIdentity(context)
 }

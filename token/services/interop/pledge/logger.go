@@ -8,4 +8,4 @@ package pledge
 
 import "github.com/hyperledger-labs/fabric-smart-client/platform/view/services/flogging"
 
-var logger = flogging.MustGetLogger("token-sdk.pledge")
+var logger = flogging.MustGetLogger("token-sdk.services.pledge")
