@@ -76,6 +76,7 @@ func (v *Provider) Vault(network string, channel string, namespace string) (driv
 				orion2.NewVault(ons, tokenStore),
 			)
 		}
+		return nil, errors.Errorf("no valid network found for [%s]", network)
 	}
 
 	// update cache
