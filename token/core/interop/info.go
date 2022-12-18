@@ -76,9 +76,9 @@ func GetOwnerAuditInfo(raw []byte, s AuditInfoProvider) ([]byte, error) {
 
 		// Notice that recipient is in another network, but the issuer is
 		// the actual recipient of the script because it is in the same network.
-		auditInfo.Recipient, err = s.GetAuditInfo(recipient)
+		auditInfo.Recipient, err = s.GetAuditInfo(issuer)
 		if err != nil {
-			return nil, errors.Wrapf(err, "failed getting audit info for recipient of pledge script [%s]", view.Identity(raw).String())
+			return nil, errors.Wrapf(err, "failed getting audit info for issuer of pledge script [%s]", view.Identity(raw).String())
 		}
 	}
 
