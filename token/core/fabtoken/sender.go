@@ -7,8 +7,6 @@ SPDX-License-Identifier: Apache-2.0
 package fabtoken
 
 import (
-	"encoding/json"
-
 	"github.com/hyperledger-labs/fabric-smart-client/platform/view/view"
 	"github.com/hyperledger-labs/fabric-token-sdk/token/core/common"
 	"github.com/hyperledger-labs/fabric-token-sdk/token/core/identity"
@@ -105,36 +103,7 @@ func (s *Service) Transfer(txID string, wallet driver.OwnerWallet, ids []*token2
 	for _, output := range outs {
 		auditInfo, err := interop.GetOwnerAuditInfo(output.Output.Owner.Raw, s)
 		if err != nil {
-			return nil, nil, errors.Wrapf(err, "failed getting audit info for recipient identity [%s]", view.Identity(output.Output.Owner.Raw).String())
-		}
-		if len(output.Output.Owner.Raw) == 0 { // redeem
-			receiverAuditInfos = append(receiverAuditInfos, []byte{})
-			continue
-		}
-		owner, err := identity.UnmarshallRawOwner(output.Output.Owner.Raw)
-		if err != nil {
-			return nil, nil, errors.Wrap(err, "failed to unmarshal owner of token")
-		}
-		if owner.Type == pledge.ScriptType {
-			script := &pledge.Script{}
-			err = json.Unmarshal(owner.Identity, script)
-			if err != nil {
-				return nil, nil, errors.Wrapf(err, "failed to unmarshal pledge script")
-			}
-			aInfo := &interop.ScriptInfo{}
-			aInfo.Sender, err = s.GetAuditInfo(script.Sender)
-			if err != nil {
-				return nil, nil, errors.Wrapf(err, "failed getting audit info for script [%s]", view.Identity(output.Output.Owner.Raw).String())
-			}
-
-			aInfo.Recipient, err = s.GetAuditInfo(script.Issuer)
-			if err != nil {
-				return nil, nil, errors.Wrapf(err, "failed getting audit info for script [%s]", view.Identity(output.Output.Owner.Raw).String())
-			}
-			auditInfo, err = json.Marshal(aInfo)
-			if err != nil {
-				return nil, nil, errors.Wrapf(err, "failed marshaling audit info for script")
-			}
+			return nil, nil, errors.Wrapf(err, "failed getting audit info for identity [%s]", view.Identity(output.Output.Owner.Raw).String())
 		}
 		receiverAuditInfos = append(receiverAuditInfos, auditInfo)
 	}
