@@ -315,8 +315,16 @@ func TestAssetTransferWithTwoNetworks(network *integration.Infrastructure) {
 	// give some time to the nodes to get the public parameters
 	time.Sleep(10 * time.Second)
 
-	alpha := token.TMSID{Network: "alpha"}
-	beta := token.TMSID{Network: "beta"}
+	alpha := token.TMSID{
+		Network:   "alpha",
+		Channel:   "testchannel",
+		Namespace: "tns",
+	}
+	beta := token.TMSID{
+		Network:   "beta",
+		Channel:   "testchannel",
+		Namespace: "tns",
+	}
 
 	alphaURL := interop.FabricURL(alpha)
 	betaURL := interop.FabricURL(beta)

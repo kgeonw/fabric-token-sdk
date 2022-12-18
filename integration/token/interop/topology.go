@@ -32,7 +32,7 @@ func HTLCSingleFabricNetworkTopology(tokenSDKDriver string) []api.Topology {
 
 	// FSC
 	fscTopology := fsc.NewTopology()
-	fscTopology.SetLogging("db.driver.badger=info:debug", "")
+	//fscTopology.SetLogging("db.driver.badger=info:debug", "")
 
 	issuer := fscTopology.AddNodeByName("issuer").AddOptions(
 		fabric.WithOrganization("Org1"),
@@ -519,7 +519,7 @@ func AssetTransferTopology(tokenSDKDriver string) []api.Topology {
 
 	// FSC
 	fscTopology := fsc.NewTopology()
-	//fscTopology.SetLogging("debug", "")
+	//fscTopology.SetLogging("db.driver.badger=info:debug", "")
 
 	wTopology := weaver.NewTopology()
 	wTopology.AddRelayServer(f1Topology, "Org1").AddFabricNetwork(f2Topology)
