@@ -8,7 +8,6 @@ package fabtoken
 
 import (
 	"encoding/json"
-	"fmt"
 
 	"github.com/hyperledger-labs/fabric-smart-client/platform/view/services/hash"
 	"github.com/hyperledger-labs/fabric-smart-client/platform/view/view"
@@ -56,6 +55,18 @@ func (s *Service) Issue(issuerIdentity view.Identity, typ string, values []uint6
 		metas = append(metas, metaRaw)
 	}
 
+	md, err := getIssueActionMetadata(opts)
+	if err != nil {
+		return nil, nil, nil, errors.Wrapf(err, "failed getting issue action metadata")
+	}
+
+	return &IssueAction{Issuer: issuerIdentity, Outputs: outs, Metadata: md},
+		metas,
+		issuerIdentity,
+		nil
+}
+
+func getIssueActionMetadata(opts *driver.IssueOptions) (map[string][]byte, error) {
 	var metadata *IssueMetadata
 	var proof []byte
 	if len(opts.Attributes) != 0 {
@@ -72,20 +83,15 @@ func (s *Service) Issue(issuerIdentity view.Identity, typ string, values []uint6
 			proof = proofOpt.([]byte)
 		}
 	}
-	var md map[string][]byte
 	if metadata != nil {
 		marshalled, err := json.Marshal(metadata)
 		key := hash.Hashable(marshalled).String()
 		if err != nil {
-			panic(fmt.Sprintf("failed marshaling metadata; origin network [%s]; origin tokenID [%s]", metadata.OriginNetwork, metadata.OriginTokenID))
+			return nil, errors.Wrapf(err, "failed marshaling metadata; origin network [%s]; origin tokenID [%s]", metadata.OriginNetwork, metadata.OriginTokenID)
 		}
-		md = map[string][]byte{key: marshalled, key + "proof_of_claim": proof}
+		return map[string][]byte{key: marshalled, key + "proof_of_claim": proof}, nil
 	}
-
-	return &IssueAction{Issuer: issuerIdentity, Outputs: outs, Metadata: md},
-		metas,
-		issuerIdentity,
-		nil
+	return nil, nil
 }
 
 // VerifyIssue checks if the outputs of an IssueAction match the passed tokenInfos
