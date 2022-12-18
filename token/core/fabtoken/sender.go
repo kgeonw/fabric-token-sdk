@@ -12,7 +12,7 @@ import (
 	"github.com/hyperledger-labs/fabric-smart-client/platform/view/view"
 	"github.com/hyperledger-labs/fabric-token-sdk/token/core/common"
 	"github.com/hyperledger-labs/fabric-token-sdk/token/core/identity"
-	"github.com/hyperledger-labs/fabric-token-sdk/token/core/interop/htlc"
+	"github.com/hyperledger-labs/fabric-token-sdk/token/core/interop"
 	"github.com/hyperledger-labs/fabric-token-sdk/token/driver"
 	htlc2 "github.com/hyperledger-labs/fabric-token-sdk/token/services/interop/htlc"
 	"github.com/hyperledger-labs/fabric-token-sdk/token/services/interop/pledge"
@@ -77,21 +77,16 @@ func (s *Service) Transfer(txID string, wallet driver.OwnerWallet, ids []*token2
 			receivers = append(receivers, output.Output.Owner.Raw)
 			continue
 		}
+		_, recipient, issuer, err := interop.GetScriptSenderAndRecipient(owner)
+		if err != nil {
+			return nil, nil, errors.Wrap(err, "failed getting script sender and recipient")
+		}
 		if owner.Type == htlc2.ScriptType {
-			_, recipient, err := htlc.GetScriptSenderAndRecipient(owner)
-			if err != nil {
-				return nil, nil, errors.Wrap(err, "failed getting script sender and recipient")
-			}
 			receivers = append(receivers, recipient)
 			continue
 		}
 		if owner.Type == pledge.ScriptType {
-			script := &pledge.Script{}
-			err := json.Unmarshal(owner.Identity, script)
-			if err != nil {
-				return nil, nil, errors.Errorf("failed to unmarshal RawOwner as a pledge script")
-			}
-			receivers = append(receivers, script.Issuer)
+			receivers = append(receivers, issuer)
 			continue
 		}
 		return nil, nil, errors.Errorf("owner's type not recognized [%s]", owner.Type)
@@ -99,7 +94,7 @@ func (s *Service) Transfer(txID string, wallet driver.OwnerWallet, ids []*token2
 
 	var senderAuditInfos [][]byte
 	for _, t := range inputTokens {
-		auditInfo, err := htlc.GetOwnerAuditInfo(t.Owner.Raw, s)
+		auditInfo, err := interop.GetOwnerAuditInfo(t.Owner.Raw, s)
 		if err != nil {
 			return nil, nil, errors.Wrapf(err, "failed getting audit info for sender identity [%s]", view.Identity(t.Owner.Raw).String())
 		}
@@ -108,7 +103,7 @@ func (s *Service) Transfer(txID string, wallet driver.OwnerWallet, ids []*token2
 
 	var receiverAuditInfos [][]byte
 	for _, output := range outs {
-		auditInfo, err := htlc.GetOwnerAuditInfo(output.Output.Owner.Raw, s)
+		auditInfo, err := interop.GetOwnerAuditInfo(output.Output.Owner.Raw, s)
 		if err != nil {
 			return nil, nil, errors.Wrapf(err, "failed getting audit info for recipient identity [%s]", view.Identity(output.Output.Owner.Raw).String())
 		}
@@ -126,7 +121,7 @@ func (s *Service) Transfer(txID string, wallet driver.OwnerWallet, ids []*token2
 			if err != nil {
 				return nil, nil, errors.Wrapf(err, "failed to unmarshal pledge script")
 			}
-			aInfo := &htlc.ScriptInfo{}
+			aInfo := &interop.ScriptInfo{}
 			aInfo.Sender, err = s.GetAuditInfo(script.Sender)
 			if err != nil {
 				return nil, nil, errors.Wrapf(err, "failed getting audit info for script [%s]", view.Identity(output.Output.Owner.Raw).String())
