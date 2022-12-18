@@ -136,7 +136,7 @@ func retrievePledgedToken(unspentTokens *token2.UnspentTokens, tokenID *token2.I
 			if err != nil {
 				return nil, nil, errors.Wrapf(err, "failed to unmarshal owner")
 			}
-			if owner.Type == ScriptTypePledge {
+			if owner.Type == ScriptType {
 				res = append(res, tok)
 				script := &Script{}
 				if err := json.Unmarshal(owner.Identity, script); err != nil {
@@ -167,43 +167,45 @@ func (s *ScriptOwnership) IsMine(tms *token.ManagementService, tok *token2.Token
 		logger.Debugf("Is Mine [%s,%s,%s]? No, failed unmarshalling [%s]", view2.Identity(tok.Owner.Raw), tok.Type, tok.Quantity, err)
 		return nil, false
 	}
-	switch owner.Type {
-	case ScriptTypePledge:
-		script := &Script{}
-		if err := json.Unmarshal(owner.Identity, script); err != nil {
-			logger.Debugf("Is Mine [%s,%s,%s]? No, failed unmarshalling [%s]", view2.Identity(tok.Owner.Raw), tok.Type, tok.Quantity, err)
-			return nil, false
-		}
-		if script.Sender.IsNone() || script.Recipient.IsNone() || script.Issuer.IsNone() {
-			logger.Debugf("Is Mine [%s,%s,%s]? No, invalid content [%v]", view2.Identity(tok.Owner.Raw), tok.Type, tok.Quantity, script)
-			return nil, false
-		}
-
-		// I'm either a sender, recipient, or issuer
-		for _, beneficiary := range []struct {
-			identity view2.Identity
-			desc     string
-		}{
-			{
-				identity: script.Sender,
-				desc:     "sender",
-			}, {
-				identity: script.Recipient,
-				desc:     "recipient",
-			}, {
-				identity: script.Issuer,
-				desc:     "issuer",
-			},
-		} {
-			logger.Debugf("Is Mine [%s,%s,%s] as a %s?", view2.Identity(tok.Owner.Raw), tok.Type, tok.Quantity, beneficiary.desc)
-			// TODO: differentiate better
-			if wallet := tms.WalletManager().OwnerWalletByIdentity(beneficiary.identity); wallet != nil {
-				logger.Debugf("Is Mine [%s,%s,%s] as a %s? Yes", view2.Identity(tok.Owner.Raw), tok.Type, tok.Quantity, beneficiary.desc)
-				return []string{wallet.ID()}, true
-			}
-		}
-
-		logger.Debugf("Is Mine [%s,%s,%s]? No", view2.Identity(tok.Owner.Raw), tok.Type, tok.Quantity)
+	if owner.Type != ScriptType {
+		return nil, false
 	}
+
+	script := &Script{}
+	if err := json.Unmarshal(owner.Identity, script); err != nil {
+		logger.Debugf("Is Mine [%s,%s,%s]? No, failed unmarshalling [%s]", view2.Identity(tok.Owner.Raw), tok.Type, tok.Quantity, err)
+		return nil, false
+	}
+	if script.Sender.IsNone() || script.Recipient.IsNone() || script.Issuer.IsNone() {
+		logger.Debugf("Is Mine [%s,%s,%s]? No, invalid content [%v]", view2.Identity(tok.Owner.Raw), tok.Type, tok.Quantity, script)
+		return nil, false
+	}
+
+	// I'm either a sender, recipient, or issuer
+	for _, beneficiary := range []struct {
+		identity view2.Identity
+		desc     string
+	}{
+		{
+			identity: script.Sender,
+			desc:     "sender",
+		}, {
+			identity: script.Recipient,
+			desc:     "recipient",
+		}, {
+			identity: script.Issuer,
+			desc:     "issuer",
+		},
+	} {
+		logger.Debugf("Is Mine [%s,%s,%s] as a %s?", view2.Identity(tok.Owner.Raw), tok.Type, tok.Quantity, beneficiary.desc)
+		// TODO: differentiate better
+		if wallet := tms.WalletManager().OwnerWalletByIdentity(beneficiary.identity); wallet != nil {
+			logger.Debugf("Is Mine [%s,%s,%s] as a %s? Yes", view2.Identity(tok.Owner.Raw), tok.Type, tok.Quantity, beneficiary.desc)
+			return []string{wallet.ID()}, true
+		}
+	}
+
+	logger.Debugf("Is Mine [%s,%s,%s]? No", view2.Identity(tok.Owner.Raw), tok.Type, tok.Quantity)
+
 	return nil, false
 }

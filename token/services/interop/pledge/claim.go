@@ -16,7 +16,6 @@ import (
 	"github.com/hyperledger-labs/fabric-smart-client/platform/view/services/session"
 	"github.com/hyperledger-labs/fabric-smart-client/platform/view/view"
 	"github.com/hyperledger-labs/fabric-token-sdk/token"
-	"github.com/hyperledger-labs/fabric-token-sdk/token/services/interop"
 	token2 "github.com/hyperledger-labs/fabric-token-sdk/token/token"
 	"github.com/pkg/errors"
 )
@@ -206,7 +205,7 @@ func (v *receiveClaimRequestView) Call(context view.Context) (interface{}, error
 }
 
 func ValidateClaimRequest(context view.Context, req *ClaimRequest) error {
-	destination := interop.FabricURL(
+	destination := FabricURL(
 		token.TMSID{
 			Network:   fabric.GetDefaultFNS(context).Name(),
 			Channel:   fabric.GetDefaultChannel(context).Name(),

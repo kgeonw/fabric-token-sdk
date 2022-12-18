@@ -28,119 +28,119 @@ var _ = Describe("FabToken end to end", func() {
 		ii.Stop()
 	})
 
-	Describe("HTLC Single Fabric Network", func() {
-		BeforeEach(func() {
-			var err error
-			ii, err = integration.New(
-				integration2.FabTokenInteropHTLC.StartPortForNode(),
-				"",
-				interop.HTLCSingleFabricNetworkTopology("fabtoken")...,
-			)
-			Expect(err).NotTo(HaveOccurred())
-			ii.RegisterPlatformFactory(token.NewPlatformFactory())
-			ii.Generate()
-			ii.Start()
-		})
-
-		It("Performed htlc-related basic operations", func() {
-			interop.TestHTLCSingleNetwork(ii)
-		})
-	})
-
-	Describe("HTLC Single Orion Network", func() {
-		BeforeEach(func() {
-			var err error
-			ii, err = integration.New(
-				integration2.FabTokenInteropHTLCOrion.StartPortForNode(),
-				"",
-				interop.HTLCSingleOrionNetworkTopology("fabtoken")...,
-			)
-			Expect(err).NotTo(HaveOccurred())
-			ii.RegisterPlatformFactory(token.NewPlatformFactory())
-			ii.Generate()
-			ii.Start()
-		})
-
-		It("Performed htlc-related basic operations", func() {
-			interop.TestHTLCSingleNetwork(ii)
-		})
-	})
-
-	Describe("HTLC Two Fabric Networks", func() {
-		BeforeEach(func() {
-			var err error
-			ii, err = integration.New(
-				integration2.FabTokenInteropHTLCTwoFabricNetworks.StartPortForNode(),
-				"",
-				interop.HTLCTwoFabricNetworksTopology("fabtoken")...,
-			)
-			Expect(err).NotTo(HaveOccurred())
-			ii.RegisterPlatformFactory(token.NewPlatformFactory())
-			ii.Generate()
-			ii.Start()
-		})
-
-		It("Performed an htlc based atomic swap", func() {
-			interop.TestHTLCTwoNetworks(ii)
-		})
-	})
-
-	Describe("Fast Exchange Two Fabric Networks", func() {
-		BeforeEach(func() {
-			var err error
-			ii, err = integration.New(
-				integration2.FabTokenInteropFastExchangeTwoFabricNetworks.StartPortForNode(),
-				"",
-				interop.HTLCTwoFabricNetworksTopology("fabtoken")...,
-			)
-			Expect(err).NotTo(HaveOccurred())
-			ii.RegisterPlatformFactory(token.NewPlatformFactory())
-			ii.Generate()
-			ii.Start()
-		})
-
-		It("Performed a fast exchange", func() {
-			interop.TestFastExchange(ii)
-		})
-	})
-
-	Describe("HTLC No Cross Claim Two Fabric Networks", func() {
-		BeforeEach(func() {
-			var err error
-			ii, err = integration.New(
-				integration2.FabTokenInteropHTLCSwapNoCrossTwoFabricNetworks.StartPortForNode(),
-				"",
-				interop.HTLCNoCrossClaimTopology("fabtoken")...,
-			)
-			Expect(err).NotTo(HaveOccurred())
-			ii.RegisterPlatformFactory(token.NewPlatformFactory())
-			ii.Generate()
-			ii.Start()
-		})
-
-		It("Performed an htlc based atomic swap", func() {
-			interop.TestHTLCNoCrossClaimTwoNetworks(ii)
-		})
-	})
-
-	Describe("HTLC No Cross Claim with Orion and Fabric Networks", func() {
-		BeforeEach(func() {
-			var err error
-			ii, err = integration.New(
-				integration2.FabTokenInteropHTLCSwapNoCrossWithOrionAndFabricNetworks.StartPortForNode(),
-				"",
-				interop.HTLCNoCrossClaimWithOrionTopology("fabtoken")...,
-			)
-			Expect(err).NotTo(HaveOccurred())
-			ii.RegisterPlatformFactory(token.NewPlatformFactory())
-			ii.Generate()
-			ii.Start()
-		})
-
-		It("Performed an htlc based atomic swap", func() {
-			interop.TestHTLCNoCrossClaimTwoNetworks(ii)
-		})
-	})
+	//Describe("HTLC Single Fabric Network", func() {
+	//	BeforeEach(func() {
+	//		var err error
+	//		ii, err = integration.New(
+	//			integration2.FabTokenInteropHTLC.StartPortForNode(),
+	//			"",
+	//			interop.HTLCSingleFabricNetworkTopology("fabtoken")...,
+	//		)
+	//		Expect(err).NotTo(HaveOccurred())
+	//		ii.RegisterPlatformFactory(token.NewPlatformFactory())
+	//		ii.Generate()
+	//		ii.Start()
+	//	})
+	//
+	//	It("Performed htlc-related basic operations", func() {
+	//		interop.TestHTLCSingleNetwork(ii)
+	//	})
+	//})
+	//
+	//Describe("HTLC Single Orion Network", func() {
+	//	BeforeEach(func() {
+	//		var err error
+	//		ii, err = integration.New(
+	//			integration2.FabTokenInteropHTLCOrion.StartPortForNode(),
+	//			"",
+	//			interop.HTLCSingleOrionNetworkTopology("fabtoken")...,
+	//		)
+	//		Expect(err).NotTo(HaveOccurred())
+	//		ii.RegisterPlatformFactory(token.NewPlatformFactory())
+	//		ii.Generate()
+	//		ii.Start()
+	//	})
+	//
+	//	It("Performed htlc-related basic operations", func() {
+	//		interop.TestHTLCSingleNetwork(ii)
+	//	})
+	//})
+	//
+	//Describe("HTLC Two Fabric Networks", func() {
+	//	BeforeEach(func() {
+	//		var err error
+	//		ii, err = integration.New(
+	//			integration2.FabTokenInteropHTLCTwoFabricNetworks.StartPortForNode(),
+	//			"",
+	//			interop.HTLCTwoFabricNetworksTopology("fabtoken")...,
+	//		)
+	//		Expect(err).NotTo(HaveOccurred())
+	//		ii.RegisterPlatformFactory(token.NewPlatformFactory())
+	//		ii.Generate()
+	//		ii.Start()
+	//	})
+	//
+	//	It("Performed an htlc based atomic swap", func() {
+	//		interop.TestHTLCTwoNetworks(ii)
+	//	})
+	//})
+	//
+	//Describe("Fast Exchange Two Fabric Networks", func() {
+	//	BeforeEach(func() {
+	//		var err error
+	//		ii, err = integration.New(
+	//			integration2.FabTokenInteropFastExchangeTwoFabricNetworks.StartPortForNode(),
+	//			"",
+	//			interop.HTLCTwoFabricNetworksTopology("fabtoken")...,
+	//		)
+	//		Expect(err).NotTo(HaveOccurred())
+	//		ii.RegisterPlatformFactory(token.NewPlatformFactory())
+	//		ii.Generate()
+	//		ii.Start()
+	//	})
+	//
+	//	It("Performed a fast exchange", func() {
+	//		interop.TestFastExchange(ii)
+	//	})
+	//})
+	//
+	//Describe("HTLC No Cross Claim Two Fabric Networks", func() {
+	//	BeforeEach(func() {
+	//		var err error
+	//		ii, err = integration.New(
+	//			integration2.FabTokenInteropHTLCSwapNoCrossTwoFabricNetworks.StartPortForNode(),
+	//			"",
+	//			interop.HTLCNoCrossClaimTopology("fabtoken")...,
+	//		)
+	//		Expect(err).NotTo(HaveOccurred())
+	//		ii.RegisterPlatformFactory(token.NewPlatformFactory())
+	//		ii.Generate()
+	//		ii.Start()
+	//	})
+	//
+	//	It("Performed an htlc based atomic swap", func() {
+	//		interop.TestHTLCNoCrossClaimTwoNetworks(ii)
+	//	})
+	//})
+	//
+	//Describe("HTLC No Cross Claim with Orion and Fabric Networks", func() {
+	//	BeforeEach(func() {
+	//		var err error
+	//		ii, err = integration.New(
+	//			integration2.FabTokenInteropHTLCSwapNoCrossWithOrionAndFabricNetworks.StartPortForNode(),
+	//			"",
+	//			interop.HTLCNoCrossClaimWithOrionTopology("fabtoken")...,
+	//		)
+	//		Expect(err).NotTo(HaveOccurred())
+	//		ii.RegisterPlatformFactory(token.NewPlatformFactory())
+	//		ii.Generate()
+	//		ii.Start()
+	//	})
+	//
+	//	It("Performed an htlc based atomic swap", func() {
+	//		interop.TestHTLCNoCrossClaimTwoNetworks(ii)
+	//	})
+	//})
 
 	Describe("Asset Transfer With Two Fabric Networks", func() {
 		BeforeEach(func() {

@@ -12,7 +12,6 @@ import (
 
 	"github.com/hyperledger-labs/fabric-smart-client/platform/view/view"
 	token3 "github.com/hyperledger-labs/fabric-token-sdk/token"
-	"github.com/hyperledger-labs/fabric-token-sdk/token/services/interop"
 	token2 "github.com/hyperledger-labs/fabric-token-sdk/token/token"
 	"github.com/pkg/errors"
 )
@@ -91,7 +90,7 @@ func NewCollectProofOfNonExistenceView(tokenID *token2.ID, origin string, deadli
 // If no error is returned, the proof is valid with the respect to the given script.
 func RequestProofOfNonExistence(context view.Context, tokenID *token2.ID, originTMSID token3.TMSID, script *Script) ([]byte, error) {
 	// collect proof
-	originNetwork := interop.FabricURL(originTMSID)
+	originNetwork := FabricURL(originTMSID)
 	boxed, err := context.RunView(NewCollectProofOfNonExistenceView(
 		tokenID,
 		originNetwork,
@@ -137,7 +136,7 @@ func (c *collectProofOfNonExistenceView) Call(context view.Context) (interface{}
 // If no error is returned, the proof is valid with the respect to the given script.
 func RequestProofOfTokenWithMetadataExistence(context view.Context, tokenID *token2.ID, originTMSID token3.TMSID, script *Script) ([]byte, error) {
 	// collect proof
-	originNetwork := interop.FabricURL(originTMSID)
+	originNetwork := FabricURL(originTMSID)
 	boxed, err := context.RunView(NewCollectProofOfTokenWithMetadataExistenceView(
 		tokenID,
 		originNetwork,

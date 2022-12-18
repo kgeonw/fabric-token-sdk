@@ -15,7 +15,7 @@ import (
 	"github.com/hyperledger-labs/fabric-token-sdk/token"
 	"github.com/hyperledger-labs/fabric-token-sdk/token/core"
 	"github.com/hyperledger-labs/fabric-token-sdk/token/driver"
-	"github.com/hyperledger-labs/fabric-token-sdk/token/services/interop"
+	"github.com/hyperledger-labs/fabric-token-sdk/token/services/interop/pledge"
 	"github.com/pkg/errors"
 )
 
@@ -118,7 +118,7 @@ func (f *StateServiceProvider) Verifier(url string) (driver.StateVerifier, error
 	var identifier string
 
 	// Check if the url refers to a TMS known by this node, then create and return just a verifier
-	tmsID, err := interop.FabricURLToTMSID(url)
+	tmsID, err := pledge.FabricURLToTMSID(url)
 	if err != nil {
 		return nil, errors.Wrapf(err, "failed parsing url [%s]", url)
 	}

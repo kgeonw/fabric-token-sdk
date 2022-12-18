@@ -14,8 +14,6 @@ import (
 	"time"
 
 	"github.com/hyperledger-labs/fabric-token-sdk/token/core/identity"
-	pledge2 "github.com/hyperledger-labs/fabric-token-sdk/token/core/interop/pledge"
-	"github.com/hyperledger-labs/fabric-token-sdk/token/services/interop"
 	"github.com/hyperledger-labs/fabric-token-sdk/token/services/interop/pledge"
 	"github.com/hyperledger-labs/fabric-token-sdk/token/services/vault/keys"
 	"github.com/pkg/errors"
@@ -28,7 +26,7 @@ func TransferPledgeValidate(ctx *Context) error {
 		if err != nil {
 			return errors.Wrap(err, "failed to unmarshal owner of input token")
 		}
-		if owner.Type == pledge2.ScriptTypePledge {
+		if owner.Type == pledge.ScriptType {
 			if len(ctx.InputTokens) != 1 || len(ctx.Action.GetOutputs()) != 1 {
 				return errors.Errorf("invalid transfer action: a pledge script only transfers the ownership of a token")
 			}
@@ -38,7 +36,7 @@ func TransferPledgeValidate(ctx *Context) error {
 			if err != nil {
 				return err
 			}
-			script := &pledge2.PledgeScript{}
+			script := &pledge.Script{}
 			err = json.Unmarshal(sender.Identity, script)
 			if err != nil {
 				return errors.Wrap(err, "failed to unmarshal pledge script")
@@ -92,8 +90,8 @@ func TransferPledgeValidate(ctx *Context) error {
 		if err != nil {
 			return err
 		}
-		if owner.Type == interop.ScriptTypePledge {
-			script := &pledge2.PledgeScript{}
+		if owner.Type == pledge.ScriptType {
+			script := &pledge.Script{}
 			err = json.Unmarshal(owner.Identity, script)
 			if err != nil {
 				return err

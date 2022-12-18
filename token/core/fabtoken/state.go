@@ -16,8 +16,6 @@ import (
 	weaver2 "github.com/hyperledger-labs/fabric-smart-client/platform/fabric/services/weaver"
 	"github.com/hyperledger-labs/fabric-smart-client/platform/view"
 	"github.com/hyperledger-labs/fabric-token-sdk/token/core/identity"
-	pledge2 "github.com/hyperledger-labs/fabric-token-sdk/token/core/interop/pledge"
-	"github.com/hyperledger-labs/fabric-token-sdk/token/services/interop"
 	"github.com/hyperledger-labs/fabric-token-sdk/token/services/interop/pledge"
 	"github.com/hyperledger-labs/fabric-token-sdk/token/services/interop/vault/prover"
 	"github.com/hyperledger-labs/fabric-token-sdk/token/services/network/fabric/tcc"
@@ -129,7 +127,7 @@ func (v *StateVerifier) VerifyProofExistence(proofRaw []byte, tokenID *token.ID,
 	if err != nil {
 		return err
 	}
-	tmsID, err := interop.FabricURLToTMSID(v.NetworkURL)
+	tmsID, err := pledge.FabricURLToTMSID(v.NetworkURL)
 	if err != nil {
 		return err
 	}
@@ -171,10 +169,10 @@ func (v *StateVerifier) VerifyProofExistence(proofRaw []byte, tokenID *token.ID,
 	if err != nil {
 		return err
 	}
-	if owner.Type != pledge2.ScriptTypePledge {
+	if owner.Type != pledge.ScriptType {
 		return err
 	}
-	script := &pledge2.PledgeScript{}
+	script := &pledge.Script{}
 	err = json.Unmarshal(owner.Identity, script)
 	if err != nil {
 		return err
@@ -198,7 +196,7 @@ func (v *StateVerifier) VerifyProofExistence(proofRaw []byte, tokenID *token.ID,
 
 func (v *StateVerifier) VerifyProofNonExistence(proofRaw []byte, tokenID *token.ID, origin string, deadline time.Time) error {
 	// v.NetworkURL is the network from which the proof comes from
-	tokenOriginNetworkTMSID, err := interop.FabricURLToTMSID(origin)
+	tokenOriginNetworkTMSID, err := pledge.FabricURLToTMSID(origin)
 	if err != nil {
 		return errors.Wrapf(err, "failed to parse network url")
 	}
@@ -218,7 +216,7 @@ func (v *StateVerifier) VerifyProofNonExistence(proofRaw []byte, tokenID *token.
 		return errors.Wrapf(err, "failed creating key for proof of non-existence")
 	}
 
-	proofSourceNetworkTMSID, err := interop.FabricURLToTMSID(v.NetworkURL)
+	proofSourceNetworkTMSID, err := pledge.FabricURLToTMSID(v.NetworkURL)
 	if err != nil {
 		return err
 	}
@@ -240,7 +238,7 @@ func (v *StateVerifier) VerifyProofNonExistence(proofRaw []byte, tokenID *token.
 	if p.TokenID.String() != tokenID.String() {
 		return errors.Errorf("token ID in reclaim request does not match token ID in proof of non-existence")
 	}
-	if p.Origin != interop.FabricURL(tokenOriginNetworkTMSID) {
+	if p.Origin != pledge.FabricURL(tokenOriginNetworkTMSID) {
 		return errors.Errorf("origin in reclaim request does not match origin in proof of non-existence")
 	}
 
@@ -258,7 +256,7 @@ func (v *StateVerifier) VerifyProofNonExistence(proofRaw []byte, tokenID *token.
 // with metadata including the given token ID and origin network, in the target network is valid
 func (v *StateVerifier) VerifyProofTokenWithMetadataExistence(proofRaw []byte, tokenID *token.ID, origin string) error {
 	// v.NetworkURL is the network from which the proof comes from
-	tokenOriginNetworkTMSID, err := interop.FabricURLToTMSID(origin)
+	tokenOriginNetworkTMSID, err := pledge.FabricURLToTMSID(origin)
 	if err != nil {
 		return errors.Wrapf(err, "failed to parse network url")
 	}
@@ -278,7 +276,7 @@ func (v *StateVerifier) VerifyProofTokenWithMetadataExistence(proofRaw []byte, t
 		return errors.Wrapf(err, "failed creating key for proof of token existence")
 	}
 
-	proofSourceNetworkTMSID, err := interop.FabricURLToTMSID(v.NetworkURL)
+	proofSourceNetworkTMSID, err := pledge.FabricURLToTMSID(v.NetworkURL)
 	if err != nil {
 		return err
 	}
@@ -297,7 +295,7 @@ func (v *StateVerifier) VerifyProofTokenWithMetadataExistence(proofRaw []byte, t
 	if p.TokenID.String() != tokenID.String() {
 		return errors.Errorf("token ID in redeem request does not match token ID in proof of token existence")
 	}
-	if p.Origin != interop.FabricURL(tokenOriginNetworkTMSID) {
+	if p.Origin != pledge.FabricURL(tokenOriginNetworkTMSID) {
 		return errors.Errorf("origin in redeem request does not match origin in proof of token existence")
 	}
 

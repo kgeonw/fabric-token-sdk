@@ -11,7 +11,6 @@ import (
 
 	"github.com/hyperledger-labs/fabric-smart-client/platform/view/services/session"
 	"github.com/hyperledger-labs/fabric-smart-client/platform/view/view"
-	"github.com/hyperledger-labs/fabric-token-sdk/token/services/interop"
 	token2 "github.com/hyperledger-labs/fabric-token-sdk/token/token"
 	"github.com/pkg/errors"
 )
@@ -79,7 +78,7 @@ func (v *DistributePledgeView) Call(context view.Context) (interface{}, error) {
 		// TODO: retrieve token's metadata
 
 		info := &PledgeInfo{
-			Source:        interop.FabricURL(v.tx.TokenService().ID()),
+			Source:        FabricURL(v.tx.TokenService().ID()),
 			TokenType:     tokenType,
 			Amount:        amount,
 			TokenID:       tokenID,

@@ -15,7 +15,6 @@ import (
 	"github.com/hyperledger-labs/fabric-smart-client/platform/view/services/session"
 	"github.com/hyperledger-labs/fabric-smart-client/platform/view/view"
 	tokn "github.com/hyperledger-labs/fabric-token-sdk/token"
-	"github.com/hyperledger-labs/fabric-token-sdk/token/services/interop"
 	"github.com/hyperledger-labs/fabric-token-sdk/token/token"
 	"github.com/pkg/errors"
 )
@@ -216,7 +215,7 @@ func (v *approvalRequestResponderView) Call(context view.Context) (interface{}, 
 	}
 
 	// verify proof before returning it
-	origin := interop.FabricURL(req.OriginTMSID)
+	origin := FabricURL(req.OriginTMSID)
 	stateProofVerifier, err := GetStateServiceProvider(context).Verifier(script.DestinationNetwork)
 	if err != nil {
 		return nil, errors.WithMessagef(err, "failed getting verifier for [%s]", origin)

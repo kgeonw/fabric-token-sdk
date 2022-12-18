@@ -17,11 +17,7 @@ import (
 )
 
 const (
-	ScriptTypePledge = "pledge" // Pledge Script
-	PledgeKey        = "metadata.pledge"
-)
-
-const (
+	PledgeKey             = "metadata.pledge"
 	defaultDeadlineOffset = time.Hour
 )
 
@@ -65,7 +61,7 @@ func (t *Transaction) recipientAsScript(sender view.Identity, destNetwork string
 	}
 
 	ro := &identity.RawOwner{
-		Type:     ScriptTypePledge,
+		Type:     ScriptType,
 		Identity: rawScript,
 	}
 	return identity.MarshallRawOwner(ro)

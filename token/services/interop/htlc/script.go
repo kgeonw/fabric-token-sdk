@@ -20,6 +20,8 @@ import (
 	"github.com/pkg/errors"
 )
 
+const ScriptType = "htlc" // htlc script
+
 // HashInfo contains the information regarding the hashing
 type HashInfo struct {
 	Hash         []byte

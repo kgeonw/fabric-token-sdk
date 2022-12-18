@@ -18,9 +18,7 @@ import (
 	"github.com/pkg/errors"
 )
 
-const (
-	ReclaimKey = "metadata.reclaim"
-)
+const ReclaimKey = "metadata.reclaim"
 
 func (t *Transaction) Reclaim(wallet *token.OwnerWallet, tok *token2.UnspentToken, issuerSignature []byte, tokenID *token2.ID, proof []byte) error {
 	if proof == nil {
@@ -39,49 +37,49 @@ func (t *Transaction) Reclaim(wallet *token.OwnerWallet, tok *token2.UnspentToke
 	if err != nil {
 		return err
 	}
-	script := &Script{}
-	switch owner.Type {
-	case ScriptTypePledge:
-		err := json.Unmarshal(owner.Identity, script)
-		if err != nil {
-			return errors.Errorf("failed to unmarshal RawOwner as a pledge script")
-		}
 
-		// Register the signer for the reclaim
-		sigService := t.TokenService().SigService()
-		signer, err := sigService.GetSigner(script.Sender)
-		if err != nil {
-			return err
-		}
-		verifier, err := sigService.OwnerVerifier(script.Sender)
-		if err != nil {
-			return err
-		}
-		// TODO: script.Issues is an owner identity, shall we switch to issuer identity?
-		issuer, err := sigService.OwnerVerifier(script.Issuer)
-		if err != nil {
-			return err
-		}
-		reclaimSigner := &Signer{Sender: signer, IssuerSignature: issuerSignature}
-		reclaimVerifier := &Verifier{
-			Sender:   verifier,
-			Issuer:   issuer,
-			PledgeID: script.ID,
-		}
-		logger.Debugf("registering signer for reclaim...")
-		if err := sigService.RegisterSigner(
-			tok.Owner.Raw,
-			reclaimSigner,
-			reclaimVerifier,
-		); err != nil {
-			return err
-		}
-
-		if err := view2.GetEndpointService(t.SP).Bind(script.Sender, tok.Owner.Raw); err != nil {
-			return err
-		}
-	default:
+	if owner.Type != ScriptType {
 		return errors.Errorf("invalid owner type, expected a pledge script")
+	}
+
+	script := &Script{}
+	err = json.Unmarshal(owner.Identity, script)
+	if err != nil {
+		return errors.Errorf("failed to unmarshal RawOwner as a pledge script")
+	}
+
+	// Register the signer for the reclaim
+	sigService := t.TokenService().SigService()
+	signer, err := sigService.GetSigner(script.Sender)
+	if err != nil {
+		return err
+	}
+	verifier, err := sigService.OwnerVerifier(script.Sender)
+	if err != nil {
+		return err
+	}
+	// TODO: script.Issues is an owner identity, shall we switch to issuer identity?
+	issuer, err := sigService.OwnerVerifier(script.Issuer)
+	if err != nil {
+		return err
+	}
+	reclaimSigner := &Signer{Sender: signer, IssuerSignature: issuerSignature}
+	reclaimVerifier := &Verifier{
+		Sender:   verifier,
+		Issuer:   issuer,
+		PledgeID: script.ID,
+	}
+	logger.Debugf("registering signer for reclaim...")
+	if err := sigService.RegisterSigner(
+		tok.Owner.Raw,
+		reclaimSigner,
+		reclaimVerifier,
+	); err != nil {
+		return err
+	}
+
+	if err := view2.GetEndpointService(t.SP).Bind(script.Sender, tok.Owner.Raw); err != nil {
+		return err
 	}
 
 	proofKey := ReclaimKey + fmt.Sprintf(".%d.%s", tokenID.Index, tokenID.TxId)

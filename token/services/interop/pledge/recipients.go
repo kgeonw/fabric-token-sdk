@@ -16,8 +16,6 @@ import (
 	"github.com/hyperledger-labs/fabric-token-sdk/token"
 	"github.com/hyperledger-labs/fabric-token-sdk/token/services/ttx"
 	"github.com/pkg/errors"
-
-	"github.com/hyperledger-labs/fabric-token-sdk/token/services/interop"
 )
 
 func compileServiceOptions(opts ...token.ServiceOption) (*token.TMSID, error) {
@@ -161,7 +159,7 @@ func (s *RespondRequestPledgeRecipientIdentityView) Call(context view.Context) (
 		wallet = string(recipientRequest.WalletID)
 	}
 
-	tmsID, err := interop.FabricURLToTMSID(recipientRequest.Network)
+	tmsID, err := FabricURLToTMSID(recipientRequest.Network)
 	if err != nil {
 		return nil, errors.Wrapf(err, "failed parsing destination [%s]", recipientRequest.Network)
 	}

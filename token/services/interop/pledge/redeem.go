@@ -41,45 +41,44 @@ func (t *Transaction) RedeemPledge(wallet *token.OwnerWallet, tok *token2.Unspen
 		return err
 	}
 	script := &Script{}
-	switch owner.Type {
-	case ScriptTypePledge:
-		err := json.Unmarshal(owner.Identity, script)
-		if err != nil {
-			return errors.Errorf("failed to unmarshal RawOwner as a pledge script")
-		}
-
-		// Register the signer for the redeem
-		sigService := t.TokenService().SigService()
-		signer, err := sigService.GetSigner(script.Issuer)
-		if err != nil {
-			return err
-		}
-		verifier, err := sigService.OwnerVerifier(script.Issuer)
-		if err != nil {
-			return err
-		}
-		// TODO: script.Issues is an owner identity, shall we switch to issuer identity?
-		if err != nil {
-			return err
-		}
-		redeemSigner := &Signer{Issuer: signer}
-		redeemVerifier := &Verifier{
-			Issuer: verifier,
-		}
-		logger.Debugf("registering signer for redeem...")
-		if err := sigService.RegisterSigner(
-			tok.Owner.Raw,
-			redeemSigner,
-			redeemVerifier,
-		); err != nil {
-			return err
-		}
-
-		if err := view2.GetEndpointService(t.SP).Bind(script.Issuer, tok.Owner.Raw); err != nil {
-			return err
-		}
-	default:
+	if owner.Type != ScriptType {
 		return errors.Errorf("invalid owner type, expected a pledge script")
+	}
+
+	err = json.Unmarshal(owner.Identity, script)
+	if err != nil {
+		return errors.Errorf("failed to unmarshal RawOwner as a pledge script")
+	}
+
+	// Register the signer for the redeem
+	sigService := t.TokenService().SigService()
+	signer, err := sigService.GetSigner(script.Issuer)
+	if err != nil {
+		return err
+	}
+	verifier, err := sigService.OwnerVerifier(script.Issuer)
+	if err != nil {
+		return err
+	}
+	// TODO: script.Issues is an owner identity, shall we switch to issuer identity?
+	if err != nil {
+		return err
+	}
+	redeemSigner := &Signer{Issuer: signer}
+	redeemVerifier := &Verifier{
+		Issuer: verifier,
+	}
+	logger.Debugf("registering signer for redeem...")
+	if err := sigService.RegisterSigner(
+		tok.Owner.Raw,
+		redeemSigner,
+		redeemVerifier,
+	); err != nil {
+		return err
+	}
+
+	if err := view2.GetEndpointService(t.SP).Bind(script.Issuer, tok.Owner.Raw); err != nil {
+		return err
 	}
 
 	proofKey := RedeemPledgeKey + fmt.Sprintf(".%d.%s", tokenID.Index, tokenID.TxId)

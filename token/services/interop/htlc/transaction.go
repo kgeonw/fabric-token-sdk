@@ -23,10 +23,7 @@ import (
 	"github.com/pkg/errors"
 )
 
-const (
-	ScriptType            = "htlc" // htlc script
-	defaultDeadlineOffset = time.Hour
-)
+const defaultDeadlineOffset = time.Hour
 
 // WithHash sets a hash attribute to be used to customize the transfer command
 func WithHash(hash []byte) token.TransferOption {

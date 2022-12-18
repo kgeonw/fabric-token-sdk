@@ -11,12 +11,10 @@ import (
 
 	"github.com/hyperledger-labs/fabric-token-sdk/token"
 	"github.com/hyperledger-labs/fabric-token-sdk/token/core/identity"
-	"github.com/hyperledger-labs/fabric-token-sdk/token/core/interop/pledge"
 	"github.com/hyperledger-labs/fabric-token-sdk/token/services/interop/htlc"
+	"github.com/hyperledger-labs/fabric-token-sdk/token/services/interop/pledge"
 	"github.com/pkg/errors"
 )
-
-const ScriptTypePledge = "pledge"
 
 type Input struct {
 	*token.Input
@@ -32,7 +30,7 @@ func ToInput(i *token.Input) (*Input, error) {
 	return &Input{
 		Input:    i,
 		isHTLC:   owner.Type == htlc.ScriptType,
-		isPledge: owner.Type == ScriptTypePledge,
+		isPledge: owner.Type == pledge.ScriptType,
 	}, nil
 }
 
@@ -60,7 +58,7 @@ func (i *Input) HTLC() (*htlc.Script, error) {
 	return script, nil
 }
 
-func (i *Input) Pledge() (*pledge.PledgeScript, error) {
+func (i *Input) Pledge() (*pledge.Script, error) {
 	if !i.isPledge {
 		return nil, errors.New("this input does not refer to a pledge script")
 	}
@@ -68,7 +66,7 @@ func (i *Input) Pledge() (*pledge.PledgeScript, error) {
 	if err != nil {
 		return nil, errors.Wrapf(err, "failed to unmarshal owner")
 	}
-	script := &pledge.PledgeScript{}
+	script := &pledge.Script{}
 	err = json.Unmarshal(owner.Identity, script)
 	if err != nil {
 		return nil, errors.Wrapf(err, "failed to unmarshal pledge script")
@@ -91,7 +89,7 @@ func ToOutput(o *token.Output) (*Output, error) {
 		return &Output{
 			Output:   o,
 			isHTLC:   owner.Type == htlc.ScriptType,
-			isPledge: owner.Type == ScriptTypePledge,
+			isPledge: owner.Type == pledge.ScriptType,
 		}, nil
 	}
 	return &Output{
@@ -124,7 +122,7 @@ func (o *Output) HTLC() (*htlc.Script, error) {
 	return script, nil
 }
 
-func (o *Output) Pledge() (*pledge.PledgeScript, error) {
+func (o *Output) Pledge() (*pledge.Script, error) {
 	if !o.isPledge {
 		return nil, errors.New("this output does not refer to a pledge script")
 	}
@@ -132,7 +130,7 @@ func (o *Output) Pledge() (*pledge.PledgeScript, error) {
 	if err != nil {
 		return nil, errors.Wrapf(err, "failed to unmarshal owner")
 	}
-	script := &pledge.PledgeScript{}
+	script := &pledge.Script{}
 	err = json.Unmarshal(owner.Identity, script)
 	if err != nil {
 		return nil, errors.Wrapf(err, "failed to unmrshal pledge script")

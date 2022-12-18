@@ -85,7 +85,7 @@ func (s *Service) Transfer(txID string, wallet driver.OwnerWallet, ids []*token2
 			receivers = append(receivers, recipient)
 			continue
 		}
-		if owner.Type == pledge.ScriptTypePledge {
+		if owner.Type == pledge.ScriptType {
 			script := &pledge.Script{}
 			err := json.Unmarshal(owner.Identity, script)
 			if err != nil {
@@ -120,7 +120,7 @@ func (s *Service) Transfer(txID string, wallet driver.OwnerWallet, ids []*token2
 		if err != nil {
 			return nil, nil, errors.Wrap(err, "failed to unmarshal owner of token")
 		}
-		if owner.Type == pledge.ScriptTypePledge {
+		if owner.Type == pledge.ScriptType {
 			script := &pledge.Script{}
 			err = json.Unmarshal(owner.Identity, script)
 			if err != nil {

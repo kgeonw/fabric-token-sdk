@@ -44,11 +44,7 @@ func (o *OutputStream) ByScript() *OutputStream {
 		if err != nil {
 			return false
 		}
-		switch owner.Type {
-		case ScriptTypePledge:
-			return true
-		}
-		return false
+		return owner.Type == ScriptType
 	})
 }
 
@@ -59,8 +55,7 @@ func (o *OutputStream) ScriptAt(i int) *Script {
 		logger.Debugf("failed unmarshalling raw owner [%s]: [%s]", tok, err)
 		return nil
 	}
-	switch owner.Type {
-	case ScriptTypePledge:
+	if owner.Type == ScriptType {
 		script := &Script{}
 		if err := json.Unmarshal(owner.Identity, script); err != nil {
 			logger.Debugf("failed unmarshalling pledge script [%s]: [%s]", tok, err)

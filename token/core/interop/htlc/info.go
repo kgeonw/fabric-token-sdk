@@ -86,7 +86,7 @@ func GetScriptSenderAndRecipient(ro *identity.RawOwner) (sender, recipient view.
 		}
 		return script.Sender, script.Recipient, nil
 	}
-	if ro.Type == pledge.ScriptTypePledge {
+	if ro.Type == pledge.ScriptType {
 		script := &pledge.Script{}
 		err = json.Unmarshal(ro.Identity, script)
 		if err != nil {

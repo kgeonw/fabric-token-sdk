@@ -18,8 +18,8 @@ import (
 	"github.com/hyperledger-labs/fabric-token-sdk/integration/token/interop/views"
 	"github.com/hyperledger-labs/fabric-token-sdk/token"
 	"github.com/hyperledger-labs/fabric-token-sdk/token/services/auditor"
-	"github.com/hyperledger-labs/fabric-token-sdk/token/services/interop"
 	"github.com/hyperledger-labs/fabric-token-sdk/token/services/interop/htlc"
+	pledge2 "github.com/hyperledger-labs/fabric-token-sdk/token/services/interop/pledge"
 	token2 "github.com/hyperledger-labs/fabric-token-sdk/token/token"
 	. "github.com/onsi/gomega"
 	"github.com/pkg/errors"
@@ -326,8 +326,8 @@ func TestAssetTransferWithTwoNetworks(network *integration.Infrastructure) {
 		Namespace: "tns",
 	}
 
-	alphaURL := interop.FabricURL(alpha)
-	betaURL := interop.FabricURL(beta)
+	alphaURL := pledge2.FabricURL(alpha)
+	betaURL := pledge2.FabricURL(beta)
 
 	RegisterAuditor(network, token.WithTMSID(alpha))
 	RegisterAuditor(network, token.WithTMSID(beta))
