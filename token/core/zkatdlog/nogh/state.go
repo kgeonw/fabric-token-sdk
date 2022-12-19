@@ -139,11 +139,7 @@ func (v *StateVerifier) VerifyProofExistence(proofRaw []byte, tokenID *token.ID,
 	if len(raw) == 0 {
 		return errors.Errorf("failed to check proof of existence, missing key-value pair")
 	}
-	tok := &token.Token{}
-	err = json.Unmarshal(raw, tok)
-	if err != nil {
-		return err
-	}
+
 	// Validate against pledge
 	logger.Debugf("verify proof of existence for token id [%s]", tokenID)
 	pledges, err := pledge.PledgeVault(v.SP).PledgeByTokenID(tokenID)
