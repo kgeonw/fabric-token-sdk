@@ -9,11 +9,13 @@ package driver
 import (
 	"time"
 
+	fabric2 "github.com/hyperledger-labs/fabric-smart-client/platform/fabric"
 	"github.com/hyperledger-labs/fabric-smart-client/platform/view"
 	"github.com/hyperledger-labs/fabric-smart-client/platform/view/services/kvs"
 	"github.com/hyperledger-labs/fabric-token-sdk/token"
 	"github.com/hyperledger-labs/fabric-token-sdk/token/core"
 	"github.com/hyperledger-labs/fabric-token-sdk/token/core/config"
+	"github.com/hyperledger-labs/fabric-token-sdk/token/core/fabric"
 	"github.com/hyperledger-labs/fabric-token-sdk/token/core/identity"
 	"github.com/hyperledger-labs/fabric-token-sdk/token/core/identity/msp"
 	"github.com/hyperledger-labs/fabric-token-sdk/token/core/zkatdlog/crypto"
@@ -26,6 +28,22 @@ import (
 )
 
 type Driver struct {
+}
+
+func (d *Driver) NewStateQueryExecutor(sp driver.ServiceProvider, url string) (driver.StateQueryExecutor, error) {
+	return &zkatdlog.StateQueryExecutor{
+		TargetNetworkURL: url,
+		SP:               sp,
+		RelaySelector:    fabric2.GetDefaultFNS(sp),
+	}, nil
+}
+
+func (d *Driver) NewStateVerifier(sp driver.ServiceProvider, url string) (driver.StateVerifier, error) {
+	return &zkatdlog.StateVerifier{
+		NetworkURL:    url,
+		SP:            sp,
+		RelaySelector: fabric2.GetDefaultFNS(sp),
+	}, nil
 }
 
 func (d *Driver) PublicParametersFromBytes(params []byte) (driver.PublicParameters, error) {
@@ -138,5 +156,7 @@ func (d *Driver) NewPublicParametersManager(params driver.PublicParameters) (dri
 }
 
 func init() {
-	core.Register(crypto.DLogPublicParameters, &Driver{})
+	d := &Driver{}
+	core.Register(crypto.DLogPublicParameters, d)
+	fabric.RegisterStateDriver(crypto.DLogPublicParameters, d)
 }

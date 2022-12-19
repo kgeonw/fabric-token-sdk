@@ -4,7 +4,7 @@ Copyright IBM Corp. All Rights Reserved.
 SPDX-License-Identifier: Apache-2.0
 */
 
-package fabtoken
+package nogh
 
 import (
 	"encoding/base64"
@@ -159,17 +159,8 @@ func (v *StateVerifier) VerifyProofExistence(proofRaw []byte, tokenID *token.ID,
 	info := pledges[0]
 	logger.Debugf("found pledge info for token id [%s]: [%s]", tokenID, info.Source)
 
-	if tok.Type != info.TokenType {
-		return errors.Errorf("type of pledge token does not match type in claim request")
-	}
-	q, err := token.ToQuantity(tok.Quantity, 64)
-	if err != nil {
-		return err
-	}
-	expectedQ := token.NewQuantityFromUInt64(info.Amount)
-	if expectedQ.Cmp(q) != 0 {
-		return errors.Errorf("quantity in pledged token is different from quantity in claim request")
-	}
+	// TODO compare token type and quantity
+
 	owner, err := identity.UnmarshallRawOwner(tok.Owner.Raw)
 	if err != nil {
 		return err
@@ -194,7 +185,6 @@ func (v *StateVerifier) VerifyProofExistence(proofRaw []byte, tokenID *token.ID,
 	if script.DestinationNetwork != info.Script.DestinationNetwork {
 		return errors.Errorf("destination network in claim request does not match destination network in proof [%s vs.%s]", info.Script.DestinationNetwork, script.DestinationNetwork)
 	}
-
 	return nil
 }
 
