@@ -103,7 +103,7 @@ func (s *Service) Transfer(txID string, wallet driver.OwnerWallet, ids []*token2
 	for _, output := range outs {
 		auditInfo, err := interop.GetOwnerAuditInfo(output.Output.Owner.Raw, s)
 		if err != nil {
-			return nil, nil, errors.Wrapf(err, "failed getting audit info for identity [%s]", view.Identity(output.Output.Owner.Raw).String())
+			return nil, nil, errors.Wrapf(err, "failed getting audit info for receiver identity [%s]", view.Identity(output.Output.Owner.Raw).String())
 		}
 		receiverAuditInfos = append(receiverAuditInfos, auditInfo)
 	}

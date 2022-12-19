@@ -161,47 +161,19 @@ func (cc *TokenChaincode) Invoke(stub shim.ChaincodeStubInterface) (res pb.Respo
 			return cc.AreTokensSpent(args[1], stub)
 		case ProofOfTokenExistenceQuery:
 			if len(args) != 2 {
-				argStr := ""
-				for _, arg := range args {
-					argStr += "(" + string(arg) + "),"
-				}
-				return shim.Error(fmt.Sprintf("(ProofOfTokenExistenceQuery) invalid number of arguments, expected 2, got [%d] [%s]", len(args), argStr))
+				return shim.Error(fmt.Sprintf("(ProofOfTokenExistenceQuery) invalid number of arguments, expected 2, got [%d]", len(args)))
 			}
-			raw, err := base64.StdEncoding.DecodeString(string(args[1]))
-			if err != nil {
-				return shim.Error(fmt.Sprintf("(ProofOfTokenExistenceQuery) invalid argument [%s]: failed unmarshalling [%s]", string(args[1]), err))
-			}
-			tokenId := &token2.ID{}
-			if err := json.Unmarshal(raw, tokenId); err != nil {
-				return shim.Error(fmt.Sprintf("(ProofOfTokenExistenceQuery) invalid argument [%s]: failed unmarshalling [%s]", string(args[1]), err))
-			}
-			return cc.proveTokenExists(tokenId, stub)
+			return cc.ProofOfTokenExistenceQuery(args[1], stub)
 		case ProofOfTokenNonExistenceQuery:
 			if len(args) != 2 {
 				return shim.Error(fmt.Sprintf("(ProofOfTokenNonExistenceQuery) invalid number of arguments, expected 2, got [%d]", len(args)))
 			}
-			raw, err := base64.StdEncoding.DecodeString(string(args[1]))
-			if err != nil {
-				return shim.Error(fmt.Sprintf("(ProofOfTokenNonExistenceQuery) invalid argument [%s]: failed unmarshalling [%s]", string(args[1]), err))
-			}
-			request := &ProofOfTokenNonExistenceRequest{}
-			if err := json.Unmarshal(raw, request); err != nil {
-				return shim.Error(fmt.Sprintf("(ProofOfTokenNonExistenceQuery) invalid argument [%s]: failed unmarshalling [%s]", string(args[1]), err))
-			}
-			return cc.proveTokenDoesNotExist(request.TokenID, request.OriginNetwork, request.Deadline, stub)
+			return cc.ProofOfTokenNonExistenceQuery(args[1], stub)
 		case ProofOfTokenMetadataExistenceQuery:
 			if len(args) != 2 {
 				return shim.Error(fmt.Sprintf("(ProofOfTokenMetadataExistenceQuery) invalid number of arguments, expected 2, got [%d]", len(args)))
 			}
-			raw, err := base64.StdEncoding.DecodeString(string(args[1]))
-			if err != nil {
-				return shim.Error(fmt.Sprintf("(ProofOfTokenMetadataExistenceQuery) invalid argument [%s]: failed unmarshalling [%s]", string(args[1]), err))
-			}
-			request := &ProofOfTokenMetadataExistenceRequest{}
-			if err := json.Unmarshal(raw, request); err != nil {
-				return shim.Error(fmt.Sprintf("(ProofOfTokenMetadataExistenceQuery) invalid argument [%s]: failed unmarshalling [%s]", string(args[1]), err))
-			}
-			return cc.proveTokenWithMetadataExist(request.TokenID, request.OriginNetwork, stub)
+			return cc.ProofOfTokenMetadataExistenceQuery(args[1], stub)
 		default:
 			return shim.Error(fmt.Sprintf("function not [%s] recognized", f))
 		}
@@ -401,6 +373,18 @@ func (cc *TokenChaincode) NewMetricsAgent(id string) (Agent, error) {
 	return cc.MetricsAgent, nil
 }
 
+func (cc *TokenChaincode) ProofOfTokenExistenceQuery(idRaw []byte, stub shim.ChaincodeStubInterface) pb.Response {
+	raw, err := base64.StdEncoding.DecodeString(string(idRaw))
+	if err != nil {
+		return shim.Error(fmt.Sprintf("(ProofOfTokenExistenceQuery) invalid argument [%s]: failed unmarshalling [%s]", string(idRaw), err))
+	}
+	tokenId := &token2.ID{}
+	if err := json.Unmarshal(raw, tokenId); err != nil {
+		return shim.Error(fmt.Sprintf("(ProofOfTokenExistenceQuery) invalid argument [%s]: failed unmarshalling [%s]", string(idRaw), err))
+	}
+	return cc.proveTokenExists(tokenId, stub)
+}
+
 func (cc *TokenChaincode) proveTokenExists(tokenId *token2.ID, stub shim.ChaincodeStubInterface) pb.Response {
 	logger.Infof("proof of existence [%s]", tokenId.String())
 	logger.Infof("generate proof of existence...")
@@ -413,6 +397,18 @@ func (cc *TokenChaincode) proveTokenExists(tokenId *token2.ID, stub shim.Chainco
 	return shim.Success(nil)
 }
 
+func (cc *TokenChaincode) ProofOfTokenNonExistenceQuery(reqRaw []byte, stub shim.ChaincodeStubInterface) pb.Response {
+	raw, err := base64.StdEncoding.DecodeString(string(reqRaw))
+	if err != nil {
+		return shim.Error(fmt.Sprintf("(ProofOfTokenNonExistenceQuery) invalid argument [%s]: failed unmarshalling [%s]", string(reqRaw), err))
+	}
+	request := &ProofOfTokenNonExistenceRequest{}
+	if err := json.Unmarshal(raw, request); err != nil {
+		return shim.Error(fmt.Sprintf("(ProofOfTokenNonExistenceQuery) invalid argument [%s]: failed unmarshalling [%s]", string(reqRaw), err))
+	}
+	return cc.proveTokenDoesNotExist(request.TokenID, request.OriginNetwork, request.Deadline, stub)
+}
+
 func (cc *TokenChaincode) proveTokenDoesNotExist(tokenID *token2.ID, origin string, deadline time.Time, stub shim.ChaincodeStubInterface) pb.Response {
 	logger.Infof("proof of non existence of token [%s] from network [%s]", tokenID.String(), origin)
 	logger.Infof("generate proof of non-existence...")
@@ -423,6 +419,18 @@ func (cc *TokenChaincode) proveTokenDoesNotExist(tokenID *token2.ID, origin stri
 	}
 	logger.Infof("proof of non existence...done.")
 	return shim.Success(nil)
+}
+
+func (cc *TokenChaincode) ProofOfTokenMetadataExistenceQuery(reqRaw []byte, stub shim.ChaincodeStubInterface) pb.Response {
+	raw, err := base64.StdEncoding.DecodeString(string(reqRaw[1]))
+	if err != nil {
+		return shim.Error(fmt.Sprintf("(ProofOfTokenMetadataExistenceQuery) invalid argument [%s]: failed unmarshalling [%s]", string(reqRaw), err))
+	}
+	request := &ProofOfTokenMetadataExistenceRequest{}
+	if err := json.Unmarshal(raw, request); err != nil {
+		return shim.Error(fmt.Sprintf("(ProofOfTokenMetadataExistenceQuery) invalid argument [%s]: failed unmarshalling [%s]", string(reqRaw), err))
+	}
+	return cc.proveTokenWithMetadataExist(request.TokenID, request.OriginNetwork, stub)
 }
 
 func (cc *TokenChaincode) proveTokenWithMetadataExist(tokenID *token2.ID, origin string, stub shim.ChaincodeStubInterface) pb.Response {

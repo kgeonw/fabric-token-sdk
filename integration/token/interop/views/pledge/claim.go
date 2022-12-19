@@ -9,17 +9,14 @@ package pledge
 import (
 	"encoding/json"
 
-	view3 "github.com/hyperledger-labs/fabric-smart-client/platform/view"
-
 	"github.com/hyperledger-labs/fabric-smart-client/platform/fabric"
+	view3 "github.com/hyperledger-labs/fabric-smart-client/platform/view"
 	"github.com/hyperledger-labs/fabric-smart-client/platform/view/services/assert"
+	view2 "github.com/hyperledger-labs/fabric-smart-client/platform/view/services/view"
 	"github.com/hyperledger-labs/fabric-smart-client/platform/view/view"
+	"github.com/hyperledger-labs/fabric-token-sdk/token/services/interop/pledge"
 	"github.com/hyperledger-labs/fabric-token-sdk/token/services/ttx"
 	"github.com/hyperledger-labs/fabric-token-sdk/token/token"
-
-	view2 "github.com/hyperledger-labs/fabric-smart-client/platform/view/services/view"
-
-	"github.com/hyperledger-labs/fabric-token-sdk/token/services/interop/pledge"
 )
 
 // Claim contains the input information to claim a token
