@@ -14,7 +14,6 @@ import (
 	"github.com/hyperledger-labs/fabric-smart-client/platform/fabric"
 	weaver2 "github.com/hyperledger-labs/fabric-smart-client/platform/fabric/services/weaver"
 	"github.com/hyperledger-labs/fabric-smart-client/platform/view"
-	"github.com/hyperledger-labs/fabric-token-sdk/token/core/identity"
 	"github.com/hyperledger-labs/fabric-token-sdk/token/services/interop/pledge"
 	"github.com/hyperledger-labs/fabric-token-sdk/token/services/interop/vault/prover"
 	"github.com/hyperledger-labs/fabric-token-sdk/token/services/network/fabric/tcc"
@@ -159,32 +158,8 @@ func (v *StateVerifier) VerifyProofExistence(proofRaw []byte, tokenID *token.ID,
 	info := pledges[0]
 	logger.Debugf("found pledge info for token id [%s]: [%s]", tokenID, info.Source)
 
-	// TODO compare token type and quantity
+	// TODO compare token type and quantity and script, as done in fabtoken driver
 
-	owner, err := identity.UnmarshallRawOwner(tok.Owner.Raw)
-	if err != nil {
-		return err
-	}
-	if owner.Type != pledge.ScriptType {
-		return err
-	}
-	script := &pledge.Script{}
-	err = json.Unmarshal(owner.Identity, script)
-	if err != nil {
-		return err
-	}
-	if script.Recipient == nil {
-		return errors.Errorf("script in proof encodes invalid recipient")
-	}
-	if !script.Recipient.Equal(info.Script.Recipient) {
-		return errors.Errorf("recipient in claim request does not match recipient in proof")
-	}
-	if script.Deadline != info.Script.Deadline {
-		return errors.Errorf("deadline in claim request does not match deadline in proof")
-	}
-	if script.DestinationNetwork != info.Script.DestinationNetwork {
-		return errors.Errorf("destination network in claim request does not match destination network in proof [%s vs.%s]", info.Script.DestinationNetwork, script.DestinationNetwork)
-	}
 	return nil
 }
 
