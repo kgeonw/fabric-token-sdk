@@ -229,7 +229,11 @@ func ValidateClaimRequest(context view.Context, req *ClaimRequest) error {
 	if err != nil {
 		return errors.WithMessagef(err, "failed storing temporary pledge info for [%s]", info.Source)
 	}
-	v, err := GetStateServiceProvider(context).Verifier(info.Source)
+	ssp, err := GetStateServiceProvider(context)
+	if err != nil {
+		return errors.WithMessage(err, "failed getting state service provider")
+	}
+	v, err := ssp.Verifier(info.Source)
 	if err != nil {
 		return errors.WithMessagef(err, "failed getting verifier for [%s]", info.Source)
 	}

@@ -108,10 +108,10 @@ func (p *StateServiceProvider) Verifier(url string) (*StateVerifier, error) {
 }
 
 // GetStateServiceProvider returns an instance of a state service provider
-func GetStateServiceProvider(sp ServiceProvider) *StateServiceProvider {
+func GetStateServiceProvider(sp ServiceProvider) (*StateServiceProvider, error) {
 	s, err := sp.GetService(&StateServiceProvider{})
 	if err != nil {
-		panic(err)
+		return nil, errors.Wrap(err, "failed getting state service provider")
 	}
-	return s.(*StateServiceProvider)
+	return s.(*StateServiceProvider), nil
 }

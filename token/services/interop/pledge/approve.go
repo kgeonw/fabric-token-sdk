@@ -216,7 +216,11 @@ func (v *approvalRequestResponderView) Call(context view.Context) (interface{}, 
 
 	// verify proof before returning it
 	origin := FabricURL(req.OriginTMSID)
-	stateProofVerifier, err := GetStateServiceProvider(context).Verifier(script.DestinationNetwork)
+	ssp, err := GetStateServiceProvider(context)
+	if err != nil {
+		return nil, errors.WithMessage(err, "failed getting state service provider")
+	}
+	stateProofVerifier, err := ssp.Verifier(script.DestinationNetwork)
 	if err != nil {
 		return nil, errors.WithMessagef(err, "failed getting verifier for [%s]", origin)
 	}

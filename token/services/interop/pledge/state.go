@@ -11,7 +11,7 @@ import (
 	"time"
 
 	"github.com/hyperledger-labs/fabric-smart-client/platform/view/view"
-	token3 "github.com/hyperledger-labs/fabric-token-sdk/token"
+	"github.com/hyperledger-labs/fabric-token-sdk/token"
 	token2 "github.com/hyperledger-labs/fabric-token-sdk/token/token"
 	"github.com/pkg/errors"
 )
@@ -33,7 +33,7 @@ func RequestProofOfExistence(context view.Context, info *PledgeInfo) ([]byte, er
 	// collect proof
 	boxed, err := context.RunView(NewCollectProofOfExistenceView(info.TokenID, info.Source))
 	if err != nil {
-		// todo: move this to the query exector
+		// todo: move this to the query executor
 		errMsg := err.Error()
 		switch {
 		case strings.Contains(errMsg, "failed to confirm if token with ID"):
@@ -49,7 +49,11 @@ func RequestProofOfExistence(context view.Context, info *PledgeInfo) ([]byte, er
 
 	// verify proof before returning it
 	// get a proof verifier for the network that generated the proof
-	v, err := GetStateServiceProvider(context).Verifier(info.Source)
+	ssp, err := GetStateServiceProvider(context)
+	if err != nil {
+		return nil, errors.WithMessage(err, "failed getting state service provider")
+	}
+	v, err := ssp.Verifier(info.Source)
 	if err != nil {
 		return nil, errors.WithMessagef(err, "failed getting verifier for [%s]", info.Source)
 	}
@@ -62,7 +66,11 @@ func RequestProofOfExistence(context view.Context, info *PledgeInfo) ([]byte, er
 
 func (c *collectProofOfExistenceView) Call(context view.Context) (interface{}, error) {
 	// get a query executor for the target network that should contain the pledge
-	p, err := GetStateServiceProvider(context).QueryExecutor(c.source)
+	ssp, err := GetStateServiceProvider(context)
+	if err != nil {
+		return nil, errors.WithMessage(err, "failed getting state service provider")
+	}
+	p, err := ssp.QueryExecutor(c.source)
 	if err != nil {
 		return nil, errors.WithMessagef(err, "failed getting prover for [%s]", c.source)
 	}
@@ -88,7 +96,7 @@ func NewCollectProofOfNonExistenceView(tokenID *token2.ID, origin string, deadli
 // RequestProofOfNonExistence request a proof of non-existence of the given token, originally created in the given network,
 // in the destination network identified by the given script.
 // If no error is returned, the proof is valid with the respect to the given script.
-func RequestProofOfNonExistence(context view.Context, tokenID *token2.ID, originTMSID token3.TMSID, script *Script) ([]byte, error) {
+func RequestProofOfNonExistence(context view.Context, tokenID *token2.ID, originTMSID token.TMSID, script *Script) ([]byte, error) {
 	// collect proof
 	originNetwork := FabricURL(originTMSID)
 	boxed, err := context.RunView(NewCollectProofOfNonExistenceView(
@@ -112,7 +120,11 @@ func RequestProofOfNonExistence(context view.Context, tokenID *token2.ID, origin
 	}
 
 	// verify proof before returning it
-	v, err := GetStateServiceProvider(context).Verifier(script.DestinationNetwork)
+	ssp, err := GetStateServiceProvider(context)
+	if err != nil {
+		return nil, errors.WithMessage(err, "failed getting state service provider")
+	}
+	v, err := ssp.Verifier(script.DestinationNetwork)
 	if err != nil {
 		return nil, errors.WithMessagef(err, "failed getting verifier for [%s]", script.DestinationNetwork)
 	}
@@ -124,7 +136,11 @@ func RequestProofOfNonExistence(context view.Context, tokenID *token2.ID, origin
 }
 
 func (c *collectProofOfNonExistenceView) Call(context view.Context) (interface{}, error) {
-	p, err := GetStateServiceProvider(context).QueryExecutor(c.destination)
+	ssp, err := GetStateServiceProvider(context)
+	if err != nil {
+		return nil, errors.WithMessage(err, "failed getting state service provider")
+	}
+	p, err := ssp.QueryExecutor(c.destination)
 	if err != nil {
 		return nil, errors.WithMessagef(err, "failed getting prover for [%s]", c.destination)
 	}
@@ -134,7 +150,7 @@ func (c *collectProofOfNonExistenceView) Call(context view.Context) (interface{}
 // RequestProofOfTokenWithMetadataExistence request a proof of a token existence with the given token ID and origin network,
 // in the destination network identified by the given script.
 // If no error is returned, the proof is valid with the respect to the given script.
-func RequestProofOfTokenWithMetadataExistence(context view.Context, tokenID *token2.ID, originTMSID token3.TMSID, script *Script) ([]byte, error) {
+func RequestProofOfTokenWithMetadataExistence(context view.Context, tokenID *token2.ID, originTMSID token.TMSID, script *Script) ([]byte, error) {
 	// collect proof
 	originNetwork := FabricURL(originTMSID)
 	boxed, err := context.RunView(NewCollectProofOfTokenWithMetadataExistenceView(
@@ -157,7 +173,11 @@ func RequestProofOfTokenWithMetadataExistence(context view.Context, tokenID *tok
 	}
 
 	// verify proof before returning it
-	v, err := GetStateServiceProvider(context).Verifier(script.DestinationNetwork)
+	ssp, err := GetStateServiceProvider(context)
+	if err != nil {
+		return nil, errors.WithMessage(err, "failed getting state service provider")
+	}
+	v, err := ssp.Verifier(script.DestinationNetwork)
 	if err != nil {
 		return nil, errors.WithMessagef(err, "failed getting verifier for [%s]", script.DestinationNetwork)
 	}
@@ -183,7 +203,11 @@ func NewCollectProofOfTokenWithMetadataExistenceView(tokenID *token2.ID, origin 
 }
 
 func (c *collectProofOfTokenWithMetadataExistenceView) Call(context view.Context) (interface{}, error) {
-	p, err := GetStateServiceProvider(context).QueryExecutor(c.destination)
+	ssp, err := GetStateServiceProvider(context)
+	if err != nil {
+		return nil, errors.WithMessage(err, "failed getting state service provider")
+	}
+	p, err := ssp.QueryExecutor(c.destination)
 	if err != nil {
 		return nil, errors.WithMessagef(err, "failed getting prover for [%s]", c.destination)
 	}
