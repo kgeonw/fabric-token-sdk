@@ -422,7 +422,7 @@ func (cc *TokenChaincode) proveTokenDoesNotExist(tokenID *token2.ID, origin stri
 }
 
 func (cc *TokenChaincode) ProofOfTokenMetadataExistenceQuery(reqRaw []byte, stub shim.ChaincodeStubInterface) pb.Response {
-	raw, err := base64.StdEncoding.DecodeString(string(reqRaw[1]))
+	raw, err := base64.StdEncoding.DecodeString(string(reqRaw))
 	if err != nil {
 		return shim.Error(fmt.Sprintf("(ProofOfTokenMetadataExistenceQuery) invalid argument [%s]: failed unmarshalling [%s]", string(reqRaw), err))
 	}
