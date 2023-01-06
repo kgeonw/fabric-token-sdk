@@ -4,7 +4,7 @@ Copyright IBM Corp. All Rights Reserved.
 SPDX-License-Identifier: Apache-2.0
 */
 
-package nogh
+package fabric
 
 import (
 	"encoding/base64"
@@ -14,6 +14,8 @@ import (
 	"github.com/hyperledger-labs/fabric-smart-client/platform/fabric"
 	weaver2 "github.com/hyperledger-labs/fabric-smart-client/platform/fabric/services/weaver"
 	"github.com/hyperledger-labs/fabric-smart-client/platform/view"
+	"github.com/hyperledger-labs/fabric-smart-client/platform/view/services/flogging"
+	fabric2 "github.com/hyperledger-labs/fabric-token-sdk/token/core/state/fabric"
 	"github.com/hyperledger-labs/fabric-token-sdk/token/services/interop/pledge"
 	"github.com/hyperledger-labs/fabric-token-sdk/token/services/interop/vault/prover"
 	"github.com/hyperledger-labs/fabric-token-sdk/token/services/network/fabric/tcc"
@@ -21,10 +23,19 @@ import (
 	"github.com/pkg/errors"
 )
 
+var logger = flogging.MustGetLogger("token-sdk.driver.zkatdlog")
+
 type StateQueryExecutor struct {
-	TargetNetworkURL string
 	SP               view.ServiceProvider
+	TargetNetworkURL string
 	RelaySelector    *fabric.NetworkService
+}
+
+func NewStateQueryExecutor(SP view.ServiceProvider, targetNetworkURL string, relaySelector *fabric.NetworkService) (*StateQueryExecutor, error) {
+	if err := fabric2.CheckFabricScheme(targetNetworkURL); err != nil {
+		return nil, err
+	}
+	return &StateQueryExecutor{SP: SP, TargetNetworkURL: targetNetworkURL, RelaySelector: relaySelector}, nil
 }
 
 func (p *StateQueryExecutor) Exist(tokenID *token.ID) ([]byte, error) {
@@ -102,9 +113,16 @@ func (p *StateQueryExecutor) ExistsWithMetadata(tokenID *token.ID, origin string
 }
 
 type StateVerifier struct {
-	NetworkURL    string
 	SP            view.ServiceProvider
+	NetworkURL    string
 	RelaySelector *fabric.NetworkService
+}
+
+func NewStateVerifier(SP view.ServiceProvider, networkURL string, relaySelector *fabric.NetworkService) (*StateVerifier, error) {
+	if err := fabric2.CheckFabricScheme(networkURL); err != nil {
+		return nil, err
+	}
+	return &StateVerifier{SP: SP, NetworkURL: networkURL, RelaySelector: relaySelector}, nil
 }
 
 func (v *StateVerifier) VerifyProofExistence(proofRaw []byte, tokenID *token.ID, metadata []byte) error {
@@ -142,7 +160,7 @@ func (v *StateVerifier) VerifyProofExistence(proofRaw []byte, tokenID *token.ID,
 
 	// Validate against pledge
 	logger.Debugf("verify proof of existence for token id [%s]", tokenID)
-	pledges, err := pledge.PledgeVault(v.SP).PledgeByTokenID(tokenID)
+	pledges, err := pledge.Vault(v.SP).PledgeByTokenID(tokenID)
 	if err != nil {
 		logger.Errorf("failed retrieving pledge info for token id [%s]: [%s]", tokenID, err)
 		return errors.WithMessagef(err, "failed getting pledge for [%s]", tokenID)

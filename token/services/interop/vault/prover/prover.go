@@ -17,9 +17,11 @@ import (
 	"github.com/pkg/errors"
 )
 
-const ProofOfExistencePrefix = "pe"
-const ProofOfNonExistencePrefix = "pne"
-const ProofOfMetadataExistencePrefix = "pme"
+const (
+	ProofOfExistencePrefix         = "pe"
+	ProofOfNonExistencePrefix      = "pne"
+	ProofOfMetadataExistencePrefix = "pme"
+)
 
 type Metadata struct {
 	// OriginTokenID is the identifier of the pledged token in the origin network

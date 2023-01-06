@@ -34,7 +34,7 @@ type ClaimInitiatorView struct {
 
 func (c *ClaimInitiatorView) Call(context view.Context) (interface{}, error) {
 	// Retrieve proof of existence of the passed token id
-	pledges, err := pledge.PledgeVault(context).PledgeByTokenID(c.OriginTokenID)
+	pledges, err := pledge.Vault(context).PledgeByTokenID(c.OriginTokenID)
 	assert.NoError(err, "failed getting pledge")
 	assert.Equal(1, len(pledges), "expected one pledge, got [%d]", len(pledges))
 
@@ -85,7 +85,7 @@ func (c *ClaimInitiatorView) Call(context view.Context) (interface{}, error) {
 			assert.NoError(err, "the claim transaction was not committed")
 
 			// Delete pledges
-			err = pledge.PledgeVault(context).Delete(pledges)
+			err = pledge.Vault(context).Delete(pledges)
 			assert.NoError(err, "failed deleting pledges")
 
 			return tx.ID(), nil

@@ -56,7 +56,7 @@ type pledgeVault struct {
 	store store
 }
 
-func PledgeVault(sf view.ServiceProvider) *pledgeVault {
+func Vault(sf view.ServiceProvider) *pledgeVault {
 	return &pledgeVault{
 		store: &kvsStore{sf: sf},
 	}
@@ -68,7 +68,7 @@ func (ps *pledgeVault) Store(info *PledgeInfo) error {
 		return errors.Wrapf(err, "failed marshalling info to raw")
 	}
 	key, err := kvs.CreateCompositeKey(
-		"github.ibm.com/fabric-security-research/fabric-token-sdk-plus/token/services/interop/transfer",
+		"github.com/hyperledger-labs/fabric-token-sdk/token/services/interop/pledge",
 		[]string{
 			"pledge",
 			"info",
@@ -89,7 +89,7 @@ func (ps *pledgeVault) PledgeByTokenID(tokenID *token.ID) ([]*PledgeInfo, error)
 		return nil, errors.Errorf("passed nil token id")
 	}
 	it, err := ps.store.GetByPartialCompositeID(
-		"github.ibm.com/fabric-security-research/fabric-token-sdk-plus/token/services/interop/transfer",
+		"github.com/hyperledger-labs/fabric-token-sdk/token/services/interop/pledge",
 		[]string{
 			"pledge",
 			"info",
@@ -120,7 +120,7 @@ func (ps *pledgeVault) Delete(pledges []*PledgeInfo) error {
 			return errors.Wrapf(err, "failed marshalling info to raw")
 		}
 		key, err := kvs.CreateCompositeKey(
-			"github.ibm.com/fabric-security-research/fabric-token-sdk-plus/token/services/interop/transfer",
+			"github.com/hyperledger-labs/fabric-token-sdk/token/services/interop/pledge",
 			[]string{
 				"pledge",
 				"info",

@@ -20,38 +20,10 @@ import (
 )
 
 const (
-	// TODO: we need a certifiable way to query for the public parameters, the current
-	// `queryPublicParams` returns the public params via result, the certifiable way would
-	// be via rwset
 	QueryPublicParamsFunction = "queryPublicParams"
 )
 
 var logger = flogging.MustGetLogger("token-sdk-plu.state")
-
-type TokenSDKStateDriver interface {
-	NewStateQueryExecutor(sp driver.ServiceProvider, url string) (driver.StateQueryExecutor, error)
-	NewStateVerifier(sp driver.ServiceProvider, url string) (driver.StateVerifier, error)
-}
-
-var (
-	driversMu sync.RWMutex
-	drivers   = make(map[string]TokenSDKStateDriver)
-)
-
-// RegisterStateDriver makes an SSPDriver available by the provided name.
-// If Register is called twice with the same name or if driver is nil,
-// it panics.
-func RegisterStateDriver(name string, driver TokenSDKStateDriver) {
-	driversMu.Lock()
-	defer driversMu.Unlock()
-	if driver == nil {
-		panic("Register driver is nil")
-	}
-	if _, dup := drivers[name]; dup {
-		panic("Register called twice for driver " + name)
-	}
-	drivers[name] = driver
-}
 
 type StateServiceProvider struct {
 	sp             driver.ServiceProvider

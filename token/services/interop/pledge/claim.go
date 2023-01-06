@@ -49,9 +49,9 @@ func WithMetadata(tokenID *token2.ID, network string, proof []byte) token.IssueO
 		if options.Attributes == nil {
 			options.Attributes = make(map[interface{}]interface{})
 		}
-		options.Attributes["github.ibm.com/fabric-security-research/fabric-token-sdk-plus/token/services/interop/transfer/tokenID"] = tokenID
-		options.Attributes["github.ibm.com/fabric-security-research/fabric-token-sdk-plus/token/services/interop/transfer/network"] = network
-		options.Attributes["github.ibm.com/fabric-security-research/fabric-token-sdk-plus/token/services/interop/transfer/proof"] = proof
+		options.Attributes["github.com/hyperledger-labs/fabric-token-sdk/token/services/interop/pledge/tokenID"] = tokenID
+		options.Attributes["github.com/hyperledger-labs/fabric-token-sdk/token/services/interop/pledge/network"] = network
+		options.Attributes["github.com/hyperledger-labs/fabric-token-sdk/token/services/interop/pledge/proof"] = proof
 		return nil
 	}
 }
@@ -225,7 +225,7 @@ func ValidateClaimRequest(context view.Context, req *ClaimRequest) error {
 		},
 	}
 
-	err := PledgeVault(context).Store(info)
+	err := Vault(context).Store(info)
 	if err != nil {
 		return errors.WithMessagef(err, "failed storing temporary pledge info for [%s]", info.Source)
 	}

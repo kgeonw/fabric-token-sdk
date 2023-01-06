@@ -12,15 +12,15 @@ import (
 	"github.com/hyperledger-labs/fabric-token-sdk/token/core/identity"
 	"github.com/hyperledger-labs/fabric-token-sdk/token/core/interop"
 	"github.com/hyperledger-labs/fabric-token-sdk/token/driver"
-	htlc2 "github.com/hyperledger-labs/fabric-token-sdk/token/services/interop/htlc"
+	"github.com/hyperledger-labs/fabric-token-sdk/token/services/interop/htlc"
 	"github.com/hyperledger-labs/fabric-token-sdk/token/services/interop/pledge"
-	token2 "github.com/hyperledger-labs/fabric-token-sdk/token/token"
+	"github.com/hyperledger-labs/fabric-token-sdk/token/token"
 	"github.com/pkg/errors"
 )
 
 // Transfer returns a TransferAction as a function of the passed arguments
 // It also returns the corresponding TransferMetadata
-func (s *Service) Transfer(txID string, wallet driver.OwnerWallet, ids []*token2.ID, Outputs []*token2.Token, opts *driver.TransferOptions) (driver.TransferAction, *driver.TransferMetadata, error) {
+func (s *Service) Transfer(txID string, wallet driver.OwnerWallet, ids []*token.ID, Outputs []*token.Token, opts *driver.TransferOptions) (driver.TransferAction, *driver.TransferMetadata, error) {
 	// select inputs
 	inputIDs, inputTokens, err := s.TokenLoader.GetTokens(ids)
 	if err != nil {
@@ -79,7 +79,7 @@ func (s *Service) Transfer(txID string, wallet driver.OwnerWallet, ids []*token2
 		if err != nil {
 			return nil, nil, errors.Wrap(err, "failed getting script sender and recipient")
 		}
-		if owner.Type == htlc2.ScriptType {
+		if owner.Type == htlc.ScriptType {
 			receivers = append(receivers, recipient)
 			continue
 		}

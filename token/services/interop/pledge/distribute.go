@@ -142,7 +142,7 @@ func NewAcceptPledgeView(info *PledgeInfo) *AcceptPledgeView {
 
 func (a *AcceptPledgeView) Call(context view.Context) (interface{}, error) {
 	// Store info
-	if err := PledgeVault(context).Store(a.info); err != nil {
+	if err := Vault(context).Store(a.info); err != nil {
 		return nil, errors.Wrapf(err, "failed storing pledge info")
 	}
 

@@ -137,7 +137,7 @@ func (v *FastPledgeClaimResponderView) Call(context view.Context) (interface{}, 
 	assert.NoError(err, "failed accepting pledge info")
 
 	// Retrieve proof of existence of the passed token id
-	pledges, err := pledge.PledgeVault(context).PledgeByTokenID(pledgeInfo.TokenID)
+	pledges, err := pledge.Vault(context).PledgeByTokenID(pledgeInfo.TokenID)
 	assert.NoError(err, "failed getting pledge")
 	assert.Equal(1, len(pledges), "expected one pledge, got [%d]", len(pledges))
 
@@ -196,7 +196,7 @@ func (v *FastPledgeClaimResponderView) Call(context view.Context) (interface{}, 
 			assert.NoError(err, "the claim transaction was not committed")
 
 			// Delete pledges
-			err = pledge.PledgeVault(context).Delete(pledges)
+			err = pledge.Vault(context).Delete(pledges)
 			assert.NoError(err, "failed deleting pledges")
 
 			logger.Debugf("Respond to the issuer...done")
@@ -319,7 +319,7 @@ func (v *FastPledgeReClaimResponderView) Call(context view.Context) (interface{}
 	assert.NoError(err, "failed accepting pledge info")
 
 	// Retrieve proof of existence of the passed token id
-	pledges, err := pledge.PledgeVault(context).PledgeByTokenID(pledgeInfo.TokenID)
+	pledges, err := pledge.Vault(context).PledgeByTokenID(pledgeInfo.TokenID)
 	assert.NoError(err, "failed getting pledge")
 	assert.Equal(1, len(pledges), "expected one pledge, got [%d]", len(pledges))
 

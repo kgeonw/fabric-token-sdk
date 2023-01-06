@@ -13,33 +13,25 @@ import (
 	"github.com/hyperledger-labs/fabric-token-sdk/token"
 	"github.com/hyperledger-labs/fabric-token-sdk/token/core"
 	"github.com/hyperledger-labs/fabric-token-sdk/token/core/config"
-	"github.com/hyperledger-labs/fabric-token-sdk/token/core/fabric"
 	"github.com/hyperledger-labs/fabric-token-sdk/token/core/fabtoken"
+	fabric3 "github.com/hyperledger-labs/fabric-token-sdk/token/core/fabtoken/driver/state/fabric"
 	"github.com/hyperledger-labs/fabric-token-sdk/token/core/fabtoken/ppm"
 	"github.com/hyperledger-labs/fabric-token-sdk/token/core/identity"
 	"github.com/hyperledger-labs/fabric-token-sdk/token/core/identity/msp"
+	"github.com/hyperledger-labs/fabric-token-sdk/token/core/state/fabric"
 	"github.com/hyperledger-labs/fabric-token-sdk/token/driver"
 	"github.com/hyperledger-labs/fabric-token-sdk/token/services/network"
 	"github.com/pkg/errors"
 )
 
-type Driver struct {
-}
+type Driver struct{}
 
 func (d *Driver) NewStateQueryExecutor(sp driver.ServiceProvider, url string) (driver.StateQueryExecutor, error) {
-	return &fabtoken.StateQueryExecutor{
-		TargetNetworkURL: url,
-		SP:               sp,
-		RelaySelector:    fabric2.GetDefaultFNS(sp),
-	}, nil
+	return fabric3.NewStateQueryExecutor(sp, url, fabric2.GetDefaultFNS(sp))
 }
 
 func (d *Driver) NewStateVerifier(sp driver.ServiceProvider, url string) (driver.StateVerifier, error) {
-	return &fabtoken.StateVerifier{
-		NetworkURL:    url,
-		SP:            sp,
-		RelaySelector: fabric2.GetDefaultFNS(sp),
-	}, nil
+	return fabric3.NewStateVerifier(sp, url, fabric2.GetDefaultFNS(sp))
 }
 
 func (d *Driver) PublicParametersFromBytes(params []byte) (driver.PublicParameters, error) {

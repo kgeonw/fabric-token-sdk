@@ -82,9 +82,9 @@ func getIssueActionMetadata(opts *driver.IssueOptions) (map[string][]byte, error
 	var metadata *issue.Metadata
 	var proof []byte
 	if len(opts.Attributes) != 0 {
-		tokenID, ok1 := opts.Attributes["github.ibm.com/fabric-security-research/fabric-token-sdk-plus/token/services/interop/transfer/tokenID"]
-		network, ok2 := opts.Attributes["github.ibm.com/fabric-security-research/fabric-token-sdk-plus/token/services/interop/transfer/network"]
-		proofOpt, ok3 := opts.Attributes["github.ibm.com/fabric-security-research/fabric-token-sdk-plus/token/services/interop/transfer/proof"]
+		tokenID, ok1 := opts.Attributes["github.com/hyperledger-labs/fabric-token-sdk/token/services/interop/pledge/tokenID"]
+		network, ok2 := opts.Attributes["github.com/hyperledger-labs/fabric-token-sdk/token/services/interop/pledge/network"]
+		proofOpt, ok3 := opts.Attributes["github.com/hyperledger-labs/fabric-token-sdk/token/services/interop/pledge/proof"]
 		if ok1 && ok2 {
 			metadata = &issue.Metadata{
 				OriginTokenID: tokenID.(*token2.ID),
