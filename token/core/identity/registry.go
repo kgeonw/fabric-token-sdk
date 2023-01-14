@@ -131,6 +131,17 @@ func (r *WalletsRegistry) RegisterIdentity(identity view.Identity, wID string, m
 	return nil
 }
 
+func (r *WalletsRegistry) GetIdentityMetadata(identity view.Identity, wID string, meta any) error {
+	if logger.IsEnabledFor(zapcore.DebugLevel) {
+		logger.Debugf("get recipient identity metadata [%s]->[%s]", identity, wID)
+	}
+	idHash := identity.Hash()
+	if err := r.KVS.Get("meta"+idHash, meta); err != nil {
+		return errors.WithMessagef(err, "failed to retrieve identity's metadata [%s]", identity)
+	}
+	return nil
+}
+
 // GetWallet returns the wallet identifier bound to the passed identity
 func (r *WalletsRegistry) GetWallet(identity view.Identity) (string, error) {
 	var wID string
