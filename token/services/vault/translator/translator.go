@@ -21,8 +21,10 @@ var logger = flogging.MustGetLogger("token-sdk.vault.translator")
 
 // Translator validates token requests and generates the corresponding RWSets
 type Translator struct {
-	RWSet     RWSet
-	TxID      string
+	RWSet    RWSet
+	TxID     string
+	SpentIDs [][]byte
+
 	counter   uint64
 	namespace string
 }
@@ -382,6 +384,7 @@ func (w *Translator) spendTokens(ids []string, graphHiding bool) error {
 			if err != nil {
 				return errors.Wrapf(err, "failed to delete output %s", id)
 			}
+			w.SpentIDs = append(w.SpentIDs, []byte(id))
 		}
 	} else {
 		for _, id := range ids {
@@ -390,6 +393,7 @@ func (w *Translator) spendTokens(ids []string, graphHiding bool) error {
 			if err != nil {
 				return errors.Wrapf(err, "failed to add serial number %s", id)
 			}
+			w.SpentIDs = append(w.SpentIDs, []byte(id))
 		}
 	}
 
