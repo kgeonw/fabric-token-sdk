@@ -206,7 +206,7 @@ var BobAcceptedTransactions = []*ttxdb.TransactionRecord{
 	},
 }
 
-func TestAll(network *integration.Infrastructure, auditor string) {
+func TestAll(network *integration.Infrastructure, auditor string, onAuditorRestart func(*integration.Infrastructure, string)) {
 	RegisterAuditor(network, auditor)
 
 	// give some time to the nodes to get the public parameters
@@ -240,6 +240,7 @@ func TestAll(network *integration.Infrastructure, auditor string) {
 
 	Restart(network, true, auditor)
 	RegisterAuditor(network, auditor)
+	onAuditorRestart(network, auditor)
 
 	CheckBalanceAndHolding(network, "alice", "", "USD", 120, auditor)
 	CheckBalanceAndHolding(network, "alice", "alice", "USD", 120, auditor)
@@ -377,6 +378,7 @@ func TestAll(network *integration.Infrastructure, auditor string) {
 	// Restart the auditor
 	Restart(network, true, auditor)
 	RegisterAuditor(network, auditor)
+	onAuditorRestart(network, auditor)
 
 	CheckBalanceAndHolding(network, "issuer", "", "USD", 110, auditor)
 	CheckBalanceAndHolding(network, "issuer", "", "EUR", 150, auditor)
@@ -406,6 +408,7 @@ func TestAll(network *integration.Infrastructure, auditor string) {
 	Restart(network, true, "bob")
 	Restart(network, false, auditor)
 	RegisterAuditor(network, auditor)
+	onAuditorRestart(network, auditor)
 	CheckBalance(network, "bob", "", "PINE", 0)
 	CheckHolding(network, "bob", "", "PINE", 110, auditor)
 	CheckBalanceAndHolding(network, "bob", "", "EUR", 20, auditor)
