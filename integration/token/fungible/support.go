@@ -32,8 +32,8 @@ func RegisterAuditor(network *integration.Infrastructure, id string) {
 	Expect(err).NotTo(HaveOccurred())
 }
 
-func RegisterCertifier(network *integration.Infrastructure) {
-	_, err := network.Client("certifier").CallView("registerCertifier", nil)
+func RegisterCertifier(network *integration.Infrastructure, id string) {
+	_, err := network.Client(id).CallView("registerCertifier", nil)
 	Expect(err).NotTo(HaveOccurred())
 }
 
