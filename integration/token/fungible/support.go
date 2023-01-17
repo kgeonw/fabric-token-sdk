@@ -27,9 +27,12 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-func RegisterAuditor(network *integration.Infrastructure, id string) {
+func RegisterAuditor(network *integration.Infrastructure, id string, onAuditorRestart OnAuditorRestartFunc) {
 	_, err := network.Client(id).CallView("registerAuditor", nil)
 	Expect(err).NotTo(HaveOccurred())
+	if onAuditorRestart != nil {
+		onAuditorRestart(network, id)
+	}
 }
 
 func RegisterCertifier(network *integration.Infrastructure, id string) {
