@@ -28,12 +28,12 @@ import (
 )
 
 func RegisterAuditor(network *integration.Infrastructure, id string) {
-	_, err := network.Client(id).CallView("register", nil)
+	_, err := network.Client(id).CallView("registerAuditor", nil)
 	Expect(err).NotTo(HaveOccurred())
 }
 
 func RegisterCertifier(network *integration.Infrastructure) {
-	_, err := network.Client("certifier").CallView("register", nil)
+	_, err := network.Client("certifier").CallView("registerAuditor", nil)
 	Expect(err).NotTo(HaveOccurred())
 }
 
