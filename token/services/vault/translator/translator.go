@@ -21,8 +21,9 @@ var logger = flogging.MustGetLogger("token-sdk.vault.translator")
 
 // Translator validates token requests and generates the corresponding RWSets
 type Translator struct {
-	RWSet    RWSet
-	TxID     string
+	RWSet RWSet
+	TxID  string
+	// SpentIDs the spent IDs added so far
 	SpentIDs [][]byte
 
 	counter   uint64

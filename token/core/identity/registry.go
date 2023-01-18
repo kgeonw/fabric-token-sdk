@@ -111,7 +111,8 @@ func (r *WalletsRegistry) RegisterWallet(id string, w driver.Wallet) {
 	}
 }
 
-// RegisterIdentity binds the passed identity to the passed wallet identifier
+// RegisterIdentity binds the passed identity to the passed wallet identifier.
+// Additional metadata can be bound to the identity.
 func (r *WalletsRegistry) RegisterIdentity(identity view.Identity, wID string, meta any) error {
 	if logger.IsEnabledFor(zapcore.DebugLevel) {
 		logger.Debugf("put recipient identity [%s]->[%s]", identity, wID)
@@ -131,6 +132,7 @@ func (r *WalletsRegistry) RegisterIdentity(identity view.Identity, wID string, m
 	return nil
 }
 
+// GetIdentityMetadata loads metadata bound to the passed identity into the passed meta argument
 func (r *WalletsRegistry) GetIdentityMetadata(identity view.Identity, wID string, meta any) error {
 	if logger.IsEnabledFor(zapcore.DebugLevel) {
 		logger.Debugf("get recipient identity metadata [%s]->[%s]", identity, wID)
