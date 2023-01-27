@@ -43,7 +43,7 @@ func (o *orderingView) Call(context view.Context) (interface{}, error) {
 		return nil, errors.Errorf("txID is empty for token transaction [%s]", o.tx.ID())
 	}
 
-	if err := network.GetInstance(context, o.tx.Network(), "").Broadcast(o.tx.Payload.Envelope); err != nil {
+	if err := network.GetInstance(context, o.tx.Network(), o.tx.Channel()).Broadcast(o.tx.Payload.Envelope); err != nil {
 		return nil, errors.WithMessagef(err, "failed to broadcast token transaction [%s]", o.tx.ID())
 	}
 	return nil, nil
