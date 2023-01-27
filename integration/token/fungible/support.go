@@ -294,7 +294,7 @@ func TokenSelectorUnlock(network *integration.Infrastructure, id string, txID st
 	Expect(err).NotTo(HaveOccurred())
 }
 
-func BroadcastPreparedTransferCash(network *integration.Infrastructure, id string, tx []byte, finality bool, expectedErrorMsgs ...string) {
+func BroadcastPreparedTransferCash(network *integration.Infrastructure, id string, txID string, tx []byte, finality bool, expectedErrorMsgs ...string) {
 	_, err := network.Client(id).CallView("broadcastPreparedTransfer", common.JSONMarshall(&views.BroadcastPreparedTransfer{
 		Tx:       tx,
 		Finality: finality,
@@ -304,7 +304,7 @@ func BroadcastPreparedTransferCash(network *integration.Infrastructure, id strin
 		return
 	}
 
-	Expect(err).To(HaveOccurred())
+	Expect(err).To(HaveOccurred(), "transaction [%s] must have been marked as invalid", txID)
 	fmt.Println("Failed to broadcast ", err)
 	for _, msg := range expectedErrorMsgs {
 		Expect(err.Error()).To(ContainSubstring(msg), "err [%s] should contain [%s]", err.Error(), msg)
